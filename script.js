@@ -91,6 +91,7 @@ const skyCanvas = document.getElementById('sky-canvas');
 const skyCtx = skyCanvas.getContext('2d', { alpha: false });
 
 const realMountainEl = document.getElementById('real-mountain');
+const mountainLightOverlay = document.getElementById('mountain-light-overlay');
 const sunEl = document.getElementById('sun-element');
 const moonEl = document.getElementById('moon-element');
 const birdsLayer = document.getElementById('birds-layer');
@@ -169,9 +170,22 @@ function calculateScrollProgress() {
   return Math.max(0, Math.min(1, scrollTop / maxScroll));
 }
 
-window.addEventListener('scroll', () => {
+function onScrollOrTouchUpdate() {
   targetProgress = calculateScrollProgress();
-}, { passive: true });
+}
+
+window.addEventListener('scroll', onScrollOrTouchUpdate, { passive: true });
+window.addEventListener('wheel', onScrollOrTouchUpdate, { passive: true });
+window.addEventListener('touchmove', onScrollOrTouchUpdate, { passive: true });
+
+// Keyboard arrow / space navigation support
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'PageDown' || (e.key === ' ' && !e.target.matches('input, textarea, button'))) {
+    window.scrollBy({ top: 350, behavior: 'smooth' });
+  } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+    window.scrollBy({ top: -350, behavior: 'smooth' });
+  }
+});
 
 // Time of Day labels
 function getTimeLabel(p) {
@@ -256,21 +270,33 @@ function updateRealMountainLighting(p) {
   if (p < 0.5) {
     // Summer Daytime -> Warm Golden Hour
     const t = p / 0.5;
-    const bright = lerp(1.05, 0.82, t);
+    const bright = lerp(1.08, 0.85, t);
     const contrast = lerp(1.02, 1.15, t);
-    const sat = lerp(1.1, 1.35, t);
+    const sat = lerp(1.15, 1.35, t);
     const hue = lerp(0, -18, t);
-    const glow = (1 - t) * 20;
-    realMountainEl.style.filter = `brightness(${bright.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${sat.toFixed(2)}) hue-rotate(${hue.toFixed(1)}deg) drop-shadow(0 0 ${glow}px rgba(254, 240, 138, 0.3))`;
+    const glow = (1 - t) * 22;
+    realMountainEl.style.filter = `brightness(${bright.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${sat.toFixed(2)}) hue-rotate(${hue.toFixed(1)}deg) drop-shadow(0 0 ${glow}px rgba(254, 240, 138, 0.35))`;
+    
+    // Directional Sun Glow on the Mountain Face
+    if (mountainLightOverlay) {
+      const sunAlpha = Math.max(0, (1 - p * 1.6) * 0.45);
+      mountainLightOverlay.style.background = `radial-gradient(ellipse at 70% 0%, rgba(254, 240, 138, ${sunAlpha.toFixed(2)}) 0%, rgba(251, 146, 60, ${(sunAlpha * 0.4).toFixed(2)}) 45%, transparent 75%)`;
+    }
   } else {
     // Twilight Sunset -> Cool Silvery Midnight
     const nightT = (p - 0.5) / 0.5;
-    const bright = lerp(0.82, 0.38, nightT);
-    const contrast = lerp(1.15, 1.25, nightT);
+    const bright = lerp(0.85, 0.38, nightT);
+    const contrast = lerp(1.15, 1.28, nightT);
     const sat = lerp(1.35, 0.55, nightT);
     const hue = lerp(-18, 185, nightT);
     const moonGlow = nightT * 25;
-    realMountainEl.style.filter = `brightness(${bright.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${sat.toFixed(2)}) hue-rotate(${hue.toFixed(1)}deg) drop-shadow(0 0 ${moonGlow}px rgba(186, 230, 253, 0.4))`;
+    realMountainEl.style.filter = `brightness(${bright.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${sat.toFixed(2)}) hue-rotate(${hue.toFixed(1)}deg) drop-shadow(0 0 ${moonGlow}px rgba(186, 230, 253, 0.45))`;
+    
+    // Cool Lunar Glow on Mountain Ridges
+    if (mountainLightOverlay) {
+      const moonAlpha = nightT * 0.38;
+      mountainLightOverlay.style.background = `radial-gradient(ellipse at 70% 0%, rgba(224, 242, 254, ${moonAlpha.toFixed(2)}) 0%, rgba(30, 58, 138, ${(moonAlpha * 0.5).toFixed(2)}) 55%, transparent 85%)`;
+    }
   }
 }
 
@@ -340,8 +366,8 @@ function tick(timestamp) {
   const dt = Math.min(32, timestamp - lastFrameTime) / 1000;
   lastFrameTime = timestamp;
 
-  // Frame-rate independent exponential smoothing
-  const damping = 1 - Math.exp(-14 * dt);
+  // Frame-rate independent exponential smoothing (snappy & buttery smooth)
+  const damping = 1 - Math.exp(-18 * dt);
   currentProgress += (targetProgress - currentProgress) * damping;
   if (Math.abs(currentProgress - targetProgress) < 0.0002) {
     currentProgress = targetProgress;
