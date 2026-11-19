@@ -1,0 +1,800 @@
+/* ==========================================================================
+   CELESTIAL HORIZONS - DAY TO NIGHT DYNAMIC SCROLL STYLES
+   ========================================================================== */
+
+:root {
+  /* Day / Night Interpolation progress (0.0 = High Noon, 1.0 = Midnight) */
+  --progress: 0;
+
+  /* Dynamic Sky Colors */
+  --sky-top: #38bdf8;
+  --sky-mid: #93c5fd;
+  --sky-bot: #fed7aa;
+
+  /* Celestial Colors */
+  --sun-core: #fffbeb;
+  --sun-glow: rgba(251, 191, 36, 0.85);
+  --sun-flare: rgba(245, 158, 11, 0.45);
+  
+  --moon-core: #f8fafc;
+  --moon-glow: rgba(224, 242, 254, 0.8);
+  --moon-halo: rgba(186, 230, 253, 0.25);
+
+  /* Mountain Dynamic Gradient Stops (Day default) */
+  --dist-top: #60a5fa;
+  --dist-bot: #93c5fd;
+  --mid-top: #2563eb;
+  --mid-bot: #3b82f6;
+  --near-top: #1e3a8a;
+  --near-bot: #1d4ed8;
+  --fore-top: #0f172a;
+  --fore-bot: #020617;
+
+  /* Card and UI Theme Variables */
+  --card-bg: rgba(255, 255, 255, 0.65);
+  --card-border: rgba(255, 255, 255, 0.8);
+  --card-shadow: 0 20px 40px -15px rgba(234, 88, 12, 0.15), 0 0 1px 1px rgba(255, 255, 255, 0.5);
+  --text-main: #0f172a;
+  --text-muted: #334155;
+  --tag-bg: rgba(245, 158, 11, 0.2);
+  --tag-text: #b45309;
+  --accent-color: #f59e0b;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background-color: #020617;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--text-main);
+  position: relative;
+  overflow-x: hidden;
+  transition: color 0.4s ease;
+}
+
+/* ==========================================================================
+   FIXED VIEWPORT STAGE FOR PARALLAX SCENE
+   ========================================================================== */
+
+.scene-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+#sky-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+#particles-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 6;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   CELESTIAL SYSTEM: SUN & MOON
+   ========================================================================== */
+
+.celestial-system {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.celestial-body {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform, opacity, filter;
+  transition: filter 0.2s linear;
+}
+
+/* --- THE SUN --- */
+.sun {
+  width: 180px;
+  height: 180px;
+  left: 50%;
+  top: 25%;
+  margin-left: -90px;
+  margin-top: -90px;
+}
+
+.sun-core {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fff7ed 40%, #fde047 80%, #f59e0b 100%);
+  box-shadow: 
+    0 0 40px 15px rgba(254, 240, 138, 0.9),
+    0 0 100px 40px rgba(245, 158, 11, 0.65),
+    0 0 180px 80px rgba(234, 88, 12, 0.4);
+}
+
+.sun-corona {
+  position: absolute;
+  top: -40%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(254, 215, 170, 0.45) 0%, rgba(245, 158, 11, 0.2) 50%, transparent 75%);
+  animation: pulse-corona 6s ease-in-out infinite alternate;
+}
+
+.sun-flare-ring {
+  position: absolute;
+  top: -80%;
+  left: -80%;
+  width: 260%;
+  height: 260%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 237, 213, 0.25) 0%, rgba(251, 146, 60, 0.1) 60%, transparent 80%);
+  filter: blur(20px);
+}
+
+.sun-rays-burst {
+  position: absolute;
+  top: -120%;
+  left: -120%;
+  width: 340%;
+  height: 340%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 255, 255, 0.12) 0deg 15deg,
+    transparent 15deg 30deg
+  );
+  animation: rotate-rays 90s linear infinite;
+  mask-image: radial-gradient(circle, black 30%, transparent 70%);
+  -webkit-mask-image: radial-gradient(circle, black 30%, transparent 70%);
+}
+
+@keyframes rotate-rays {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse-corona {
+  0% { transform: scale(0.95); opacity: 0.75; }
+  100% { transform: scale(1.08); opacity: 1; }
+}
+
+/* --- THE MOON --- */
+.moon {
+  width: 150px;
+  height: 150px;
+  left: 50%;
+  top: 25%;
+  margin-left: -75px;
+  margin-top: -75px;
+  opacity: 0;
+  transform: translate3d(0, 300px, 0);
+}
+
+.moon-core {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #f1f5f9 45%, #cbd5e1 85%, #94a3b8 100%);
+  box-shadow: 
+    0 0 35px 12px rgba(224, 242, 254, 0.8),
+    0 0 90px 40px rgba(186, 230, 253, 0.35),
+    inset -10px -10px 25px rgba(30, 41, 59, 0.4);
+  overflow: hidden;
+}
+
+/* Moon Craters */
+.crater {
+  position: absolute;
+  border-radius: 50%;
+  background: #94a3b8;
+  opacity: 0.35;
+  box-shadow: inset 1px 1px 3px rgba(15, 23, 42, 0.6), 1px 1px 2px rgba(255, 255, 255, 0.6);
+}
+.crater.c1 { width: 26px; height: 26px; top: 28%; left: 32%; }
+.crater.c2 { width: 18px; height: 18px; top: 58%; left: 24%; }
+.crater.c3 { width: 34px; height: 34px; top: 50%; left: 56%; }
+.crater.c4 { width: 14px; height: 14px; top: 22%; left: 62%; }
+.crater.c5 { width: 10px; height: 10px; top: 76%; left: 45%; }
+.crater.c6 { width: 20px; height: 20px; top: 38%; left: 48%; }
+
+.moon-maria {
+  position: absolute;
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  background: #64748b;
+  opacity: 0.18;
+  filter: blur(4px);
+}
+.moon-maria.m1 { width: 75px; height: 60px; top: 15%; left: 20%; }
+.moon-maria.m2 { width: 65px; height: 50px; top: 55%; left: 40%; }
+
+.moon-glow {
+  position: absolute;
+  top: -30%;
+  left: -30%;
+  width: 160%;
+  height: 160%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(224, 242, 254, 0.35) 0%, rgba(186, 230, 253, 0.1) 60%, transparent 75%);
+  filter: blur(10px);
+}
+
+.moon-halo {
+  position: absolute;
+  top: -80%;
+  left: -80%;
+  width: 260%;
+  height: 260%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(147, 197, 253, 0.15) 0%, transparent 65%);
+  animation: pulse-moon 8s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-moon {
+  0% { transform: scale(0.96); opacity: 0.7; }
+  100% { transform: scale(1.04); opacity: 1; }
+}
+
+/* ==========================================================================
+   DAYTIME BIRDS
+   ========================================================================== */
+
+.birds-layer {
+  position: absolute;
+  top: 15%;
+  left: 0;
+  width: 100%;
+  height: 35%;
+  z-index: 3;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.bird {
+  position: absolute;
+  width: 24px;
+  height: 14px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.7;
+}
+
+.bird::before, .bird::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  width: 10px;
+  height: 4px;
+  border-top: 2.5px solid #1e293b;
+  border-radius: 50% 50% 0 0;
+}
+.bird::before { left: 2px; transform: rotate(-25deg); transform-origin: right center; animation: flap-left 0.7s infinite alternate ease-in-out; }
+.bird::after { right: 2px; transform: rotate(25deg); transform-origin: left center; animation: flap-right 0.7s infinite alternate ease-in-out; }
+
+.bird-1 { top: 20%; left: -50px; animation: fly-across 26s linear infinite; animation-delay: 0s; transform: scale(0.85); }
+.bird-2 { top: 38%; left: -60px; animation: fly-across 32s linear infinite; animation-delay: 6s; transform: scale(0.65); }
+.bird-3 { top: 12%; left: -40px; animation: fly-across 29s linear infinite; animation-delay: 13s; transform: scale(1.1); }
+.bird-4 { top: 48%; left: -50px; animation: fly-across 35s linear infinite; animation-delay: 19s; transform: scale(0.55); }
+.bird-5 { top: 28%; left: -70px; animation: fly-across 24s linear infinite; animation-delay: 9s; transform: scale(0.95); }
+
+@keyframes flap-left {
+  0% { transform: rotate(-35deg); }
+  100% { transform: rotate(25deg); }
+}
+
+@keyframes flap-right {
+  0% { transform: rotate(35deg); }
+  100% { transform: rotate(-25deg); }
+}
+
+@keyframes fly-across {
+  0% { transform: translateX(0vw) translateY(0px); }
+  50% { transform: translateX(55vw) translateY(-25px); }
+  100% { transform: translateX(115vw) translateY(15px); }
+}
+
+/* ==========================================================================
+   DRIFTING CLOUDS
+   ========================================================================== */
+
+.clouds-layer {
+  position: absolute;
+  top: 10%;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  z-index: 4;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.cloud {
+  position: absolute;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.15) 60%, transparent 80%);
+  filter: blur(12px);
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.cloud-1 { width: 500px; height: 160px; top: 10%; left: -20%; animation: drift-cloud 75s linear infinite; }
+.cloud-2 { width: 680px; height: 210px; top: 25%; left: 30%; animation: drift-cloud 95s linear infinite; }
+.cloud-3 { width: 420px; height: 130px; top: 5%; left: 70%; animation: drift-cloud 85s linear infinite; }
+.cloud-4 { width: 560px; height: 180px; top: 35%; left: -10%; animation: drift-cloud 110s linear infinite; }
+
+@keyframes drift-cloud {
+  0% { transform: translateX(-40vw); }
+  100% { transform: translateX(140vw); }
+}
+
+/* ==========================================================================
+   MULTI-LAYERED SVG MOUNTAINS (BOTTOM ANCHORED)
+   ========================================================================== */
+
+.mountains-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 65vh;
+  min-height: 400px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.mountain-layer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+  transform-origin: bottom center;
+}
+
+.layer-distant { z-index: 1; height: 85%; }
+.layer-mid     { z-index: 2; height: 75%; }
+.layer-near    { z-index: 3; height: 65%; }
+.layer-foreground { z-index: 4; height: 50%; }
+
+.stop-distant-top { stop-color: var(--dist-top); transition: stop-color 0.4s ease; }
+.stop-distant-bot { stop-color: var(--dist-bot); transition: stop-color 0.4s ease; }
+
+.stop-mid-top { stop-color: var(--mid-top); transition: stop-color 0.4s ease; }
+.stop-mid-bot { stop-color: var(--mid-bot); transition: stop-color 0.4s ease; }
+
+.stop-near-top { stop-color: var(--near-top); transition: stop-color 0.4s ease; }
+.stop-near-bot { stop-color: var(--near-bot); transition: stop-color 0.4s ease; }
+
+.stop-fore-top { stop-color: var(--fore-top); transition: stop-color 0.4s ease; }
+.stop-fore-bot { stop-color: var(--fore-bot); transition: stop-color 0.4s ease; }
+
+.valley-mist {
+  position: absolute;
+  bottom: 12%;
+  left: 0;
+  width: 100%;
+  height: 140px;
+  background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.22) 50%, transparent 100%);
+  filter: blur(15px);
+  z-index: 2;
+  transition: opacity 0.5s ease;
+}
+
+.ambient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 7;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+  mix-blend-mode: multiply;
+  opacity: 0.3;
+}
+
+/* ==========================================================================
+   FLOATING HUD / NAVIGATION BAR
+   ========================================================================== */
+
+.hud-header {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(92%, 1100px);
+  padding: 12px 24px;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 9999px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.hud-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.15em;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.hud-icon {
+  font-size: 1.25rem;
+}
+
+.hud-status {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  max-width: 440px;
+  margin: 0 16px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-color);
+  box-shadow: 0 0 8px var(--accent-color);
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.scroll-meter-wrap {
+  flex: 1;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.scroll-meter-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #f59e0b, #ec4899, #6366f1);
+  border-radius: 9999px;
+  transition: width 0.1s linear;
+}
+
+.progress-percent {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 38px;
+}
+
+.hud-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hud-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 9999px;
+  border: 1px solid var(--card-border);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.25s ease;
+}
+
+.hud-btn:hover {
+  background: rgba(255, 255, 255, 0.85);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================================================
+   SCROLLABLE STORY CONTENT
+   ========================================================================== */
+
+.content-wrapper {
+  position: relative;
+  z-index: 10;
+  padding-top: 15vh;
+  padding-bottom: 25vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40vh; /* Generous breathing room so celestial movements unfold smoothly */
+}
+
+.story-section {
+  width: min(92%, 760px);
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: center;
+}
+
+.story-card {
+  width: 100%;
+  padding: 48px;
+  border-radius: 32px;
+  background: var(--card-bg);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.story-card:hover {
+  transform: translateY(-4px);
+}
+
+.section-tag {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 9999px;
+  background: var(--tag-bg);
+  color: var(--tag-text);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  transition: all 0.4s ease;
+}
+
+.story-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--text-main);
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+}
+
+.story-heading {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-main);
+  margin-bottom: 20px;
+}
+
+.story-lead {
+  font-size: 1.25rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-bottom: 32px;
+}
+
+.story-card p {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.scroll-prompt {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 10px;
+}
+
+.mouse-icon {
+  width: 24px;
+  height: 38px;
+  border: 2px solid var(--text-muted);
+  border-radius: 12px;
+  position: relative;
+}
+
+.wheel {
+  width: 4px;
+  height: 8px;
+  background: var(--accent-color);
+  border-radius: 2px;
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: scroll-wheel 1.8s infinite;
+}
+
+@keyframes scroll-wheel {
+  0% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, 14px); }
+}
+
+.poetic-quote {
+  border-left: 3px solid var(--accent-color);
+  padding: 16px 22px;
+  margin: 28px 0;
+  font-style: italic;
+  font-size: 1.15rem;
+  line-height: 1.65;
+  color: var(--text-main);
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 0 16px 16px 0;
+}
+
+.feature-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.pill {
+  padding: 8px 18px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--card-border);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-main);
+  backdrop-filter: blur(8px);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-val {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.stat-lbl {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+}
+
+.action-buttons {
+  margin: 32px 0 16px;
+}
+
+.action-btn {
+  padding: 14px 28px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+  color: #ffffff;
+  box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(245, 158, 11, 0.55);
+}
+
+.footer-note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 16px;
+}
+
+/* ==========================================================================
+   RESPONSIVE QUERIES
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .hud-header {
+    width: 95%;
+    padding: 10px 16px;
+  }
+  .hud-status {
+    display: none; /* Hide progress bar on small phones for a clean HUD */
+  }
+  .story-card {
+    padding: 30px 22px;
+    border-radius: 24px;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .sun {
+    width: 130px;
+    height: 130px;
+    margin-left: -65px;
+    margin-top: -65px;
+  }
+  .moon {
+    width: 110px;
+    height: 110px;
+    margin-left: -55px;
+    margin-top: -55px;
+  }
+}

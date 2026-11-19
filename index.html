@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Celestial Horizons | Day to Night Mountain Journey</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- FIXED PARALLAX SKY & MOUNTAIN SCENERY -->
+  <div id="scene-container" class="scene-container">
+    <!-- Dynamic Sky Canvas for Gradients, Sunbeams, Stars & Aurora -->
+    <canvas id="sky-canvas"></canvas>
+
+    <!-- Celestial Sphere Container -->
+    <div id="celestial-system" class="celestial-system">
+      <!-- THE SUN -->
+      <div id="sun-element" class="celestial-body sun">
+        <div class="sun-core"></div>
+        <div class="sun-corona"></div>
+        <div class="sun-flare-ring"></div>
+        <div class="sun-rays-burst"></div>
+      </div>
+
+      <!-- THE MOON -->
+      <div id="moon-element" class="celestial-body moon">
+        <div class="moon-core">
+          <div class="crater c1"></div>
+          <div class="crater c2"></div>
+          <div class="crater c3"></div>
+          <div class="crater c4"></div>
+          <div class="crater c5"></div>
+          <div class="crater c6"></div>
+          <div class="moon-maria m1"></div>
+          <div class="moon-maria m2"></div>
+        </div>
+        <div class="moon-glow"></div>
+        <div class="moon-halo"></div>
+      </div>
+    </div>
+
+    <!-- DAYTIME BIRDS LAYER -->
+    <div id="birds-layer" class="birds-layer">
+      <div class="bird bird-1"></div>
+      <div class="bird bird-2"></div>
+      <div class="bird bird-3"></div>
+      <div class="bird bird-4"></div>
+      <div class="bird bird-5"></div>
+    </div>
+
+    <!-- NIGHTTIME FIREFLIES & PARTICLES -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- DRIFTING CLOUDS / VALLEY MIST -->
+    <div id="clouds-layer" class="clouds-layer">
+      <div class="cloud cloud-1"></div>
+      <div class="cloud cloud-2"></div>
+      <div class="cloud cloud-3"></div>
+      <div class="cloud cloud-4"></div>
+    </div>
+
+    <!-- MULTI-LAYERED SVG MOUNTAINS (BOTTOM ANCHORED) -->
+    <div id="mountains-container" class="mountains-container">
+      <!-- Distant Peak Ridge (Layer 4) -->
+      <svg class="mountain-layer layer-distant" viewBox="0 0 1920 600" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="grad-distant" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" class="stop-distant-top" />
+            <stop offset="100%" class="stop-distant-bot" />
+          </linearGradient>
+        </defs>
+        <path d="M0,600 L0,260 L140,190 L260,250 L420,120 L580,240 L720,150 L890,280 L1080,80 L1260,220 L1420,130 L1600,260 L1780,170 L1920,240 L1920,600 Z" fill="url(#grad-distant)"/>
+      </svg>
+
+      <!-- Mid-Distant Alpine Ridge (Layer 3) -->
+      <svg class="mountain-layer layer-mid" viewBox="0 0 1920 600" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="grad-mid" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" class="stop-mid-top" />
+            <stop offset="100%" class="stop-mid-bot" />
+          </linearGradient>
+        </defs>
+        <path d="M0,600 L0,320 L190,230 L360,340 L520,200 L690,330 L870,180 L1040,310 L1220,190 L1410,340 L1580,210 L1740,310 L1920,220 L1920,600 Z" fill="url(#grad-mid)"/>
+      </svg>
+
+      <!-- Valley Mist Layer -->
+      <div class="valley-mist"></div>
+
+      <!-- Near Mountains & Ridge (Layer 2) -->
+      <svg class="mountain-layer layer-near" viewBox="0 0 1920 600" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="grad-near" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" class="stop-near-top" />
+            <stop offset="100%" class="stop-near-bot" />
+          </linearGradient>
+        </defs>
+        <path d="M0,600 L0,380 L130,310 L280,390 L440,270 L620,410 L780,290 L960,390 L1150,260 L1340,380 L1510,290 L1700,390 L1920,300 L1920,600 Z" fill="url(#grad-near)"/>
+      </svg>
+
+      <!-- Foreground Craggy Pine Ridge (Layer 1) -->
+      <svg class="mountain-layer layer-foreground" viewBox="0 0 1920 500" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="grad-fore" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" class="stop-fore-top" />
+            <stop offset="100%" class="stop-fore-bot" />
+          </linearGradient>
+        </defs>
+        <!-- Mountain crags with stylized spruce pines silhouettes -->
+        <path d="M0,500 L0,380 L40,390 L60,350 L80,390 L120,400 L160,360 L200,410 L280,330 L330,370 L390,320 L450,380 L520,330 L590,400 L680,310 L750,370 L830,290 L920,370 L1010,310 L1110,390 L1200,320 L1290,400 L1390,300 L1480,380 L1570,320 L1660,390 L1760,310 L1850,370 L1920,340 L1920,500 Z" fill="url(#grad-fore)"/>
+      </svg>
+    </div>
+
+    <!-- AMBIENT LIGHTING OVERLAY -->
+    <div id="ambient-overlay" class="ambient-overlay"></div>
+  </div>
+
+  <!-- FIXED FLOATING STATUS BAR & HUD -->
+  <header class="hud-header">
+    <div class="hud-brand">
+      <span class="hud-icon">⛰️</span>
+      <span class="hud-title">SOLARIS &bull; LUNA</span>
+    </div>
+
+    <div class="hud-status">
+      <div class="status-badge" id="time-badge">
+        <span class="status-dot"></span>
+        <span id="time-text">High Summer Noon</span>
+      </div>
+      <div class="scroll-meter-wrap">
+        <div class="scroll-meter-bar" id="scroll-meter"></div>
+      </div>
+      <span id="progress-percent" class="progress-percent">0%</span>
+    </div>
+
+    <div class="hud-actions">
+      <button id="sound-btn" class="hud-btn" title="Toggle Ambient Soundscape">
+        <span class="btn-icon">🔊</span>
+        <span class="btn-label">Ambiance</span>
+      </button>
+      <button id="time-toggle-btn" class="hud-btn" title="Quick Jump Day / Night">
+        <span class="btn-icon">🌗</span>
+        <span class="btn-label">Shift</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- SCROLLABLE STORY CONTENT -->
+  <main class="content-wrapper" id="content">
+    
+    <!-- HERO SECTION (DAYTIME GLORY) -->
+    <section class="story-section section-hero" id="sec-dawn">
+      <div class="story-card glass">
+        <div class="section-tag">Phase I &bull; 12:00 PM</div>
+        <h1 class="story-title">Summer's Golden Zenith</h1>
+        <p class="story-lead">
+          Bathed in blinding radiant warmth, the towering peaks kiss the azure sky. The sun presides over alpine meadows alive with vibrant breeze and golden rays.
+        </p>
+        <div class="scroll-prompt">
+          <span>Scroll down to awaken the cosmos</span>
+          <div class="mouse-icon">
+            <div class="wheel"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: AFTERNOON TO GOLDEN HOUR -->
+    <section class="story-section" id="sec-afternoon">
+      <div class="story-card glass">
+        <div class="section-tag">Phase II &bull; 04:30 PM</div>
+        <h2 class="story-heading">The Sun's Ascendant Arc</h2>
+        <p>
+          As you read and venture deeper, the golden rays begin their grand celestial flight. The sun rises high, illuminating the high granite towers before making its long arc toward the unseen western rim.
+        </p>
+        <blockquote class="poetic-quote">
+          "The mountain does not move, yet in its quiet granite eyes, the entire universe dances from brilliant light into velvet mystery."
+        </blockquote>
+        <div class="feature-pills">
+          <span class="pill">☀️ Warm Solar Rays</span>
+          <span class="pill">🍃 Alpine Wind</span>
+          <span class="pill">🦅 Eagles Soaring</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: TWILIGHT & SUNSET TRANSITION -->
+    <section class="story-section" id="sec-twilight">
+      <div class="story-card glass">
+        <div class="section-tag">Phase III &bull; 07:45 PM</div>
+        <h2 class="story-heading">The Twilight Threshold</h2>
+        <p>
+          Daylight yields gracefully. The fiery amber horizon dissolves into deep violet and lavender haze. Shadows stretch across the quiet valleys, and the crisp bite of mountain dusk cools the earth.
+        </p>
+        <p>
+          Watch the sun ascend past the horizon while the first silver glimmer of the nocturnal crown ascends in quiet majesty. The world holds its breath between two realms.
+        </p>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-val">3,850m</span>
+            <span class="stat-lbl">Peak Elevation</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val">100%</span>
+            <span class="stat-lbl">Smooth Lerp</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-val">2.8k</span>
+            <span class="stat-lbl">Twinkling Stars</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: THE DEEP MOONLIT NIGHT -->
+    <section class="story-section" id="sec-night">
+      <div class="story-card glass night-card">
+        <div class="section-tag">Phase IV &bull; 11:30 PM</div>
+        <h2 class="story-heading">The Silver Moon's Dominion</h2>
+        <p>
+          The sun has retreated and the velvet obsidian firmament has arrived. In its place, the pearl-white Moon rises high, casting sharp silvery luminescence along the snowy ridgelines.
+        </p>
+        <p>
+          Constellations sparkle through the crystal-clear alpine atmosphere. Fireflies shimmer along the timberline, and shooting stars streak silently across the cosmic canvas.
+        </p>
+        <div class="feature-pills">
+          <span class="pill">🌕 Lunar Radiance</span>
+          <span class="pill">✨ Starfield Nebula</span>
+          <span class="pill">🌠 Meteor Showers</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: CELESTIAL EQUILIBRIUM -->
+    <section class="story-section" id="sec-eternal">
+      <div class="story-card glass final-card">
+        <div class="section-tag">The Infinite Cycle</div>
+        <h2 class="story-heading">Eternity in Motion</h2>
+        <p>
+          Light and dark are not adversaries, but partners in an eternal waltz over timeless stone. Scroll back upwards at your leisure to watch the dawn bloom anew, driving the night back into slumber.
+        </p>
+        <div class="action-buttons">
+          <button class="action-btn primary" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+            ▲ Return to Summer Sun
+          </button>
+        </div>
+        <footer class="footer-note">
+          Designed with pure CSS & Canvas &bull; Responsive, fluid scroll-driven celestial mechanics
+        </footer>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
