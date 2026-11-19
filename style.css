@@ -1,44 +1,20 @@
 /* ==========================================================================
-   CELESTIAL HORIZONS - DAY TO NIGHT DYNAMIC SCROLL STYLES
+   FOUR SEASONS - DYNAMIC SCROLL JOURNEY
+   Spring • Summer • Autumn • Winter
    ========================================================================== */
 
 :root {
-  /* Day / Night Interpolation progress (0.0 = High Noon, 1.0 = Midnight) */
   --progress: 0;
 
-  /* Dynamic Sky Colors */
-  --sky-top: #38bdf8;
-  --sky-mid: #93c5fd;
-  --sky-bot: #fed7aa;
-
-  /* Celestial Colors */
-  --sun-core: #fffbeb;
-  --sun-glow: rgba(251, 191, 36, 0.85);
-  --sun-flare: rgba(245, 158, 11, 0.45);
-  
-  --moon-core: #f8fafc;
-  --moon-glow: rgba(224, 242, 254, 0.8);
-  --moon-halo: rgba(186, 230, 253, 0.25);
-
-  /* Mountain Dynamic Gradient Stops (Day default) */
-  --dist-top: #60a5fa;
-  --dist-bot: #93c5fd;
-  --mid-top: #2563eb;
-  --mid-bot: #3b82f6;
-  --near-top: #1e3a8a;
-  --near-bot: #1d4ed8;
-  --fore-top: #0f172a;
-  --fore-bot: #020617;
-
-  /* Card and UI Theme Variables */
-  --card-bg: rgba(255, 255, 255, 0.65);
-  --card-border: rgba(255, 255, 255, 0.8);
-  --card-shadow: 0 20px 40px -15px rgba(234, 88, 12, 0.15), 0 0 1px 1px rgba(255, 255, 255, 0.5);
+  /* Dynamic Theme Accents */
+  --accent-color: #ec4899;
+  --tag-bg: rgba(236, 72, 153, 0.18);
+  --tag-text: #be185d;
+  --card-bg: rgba(255, 255, 255, 0.72);
+  --card-border: rgba(255, 255, 255, 0.85);
+  --card-shadow: 0 20px 45px -15px rgba(236, 72, 153, 0.2);
   --text-main: #0f172a;
   --text-muted: #334155;
-  --tag-bg: rgba(245, 158, 11, 0.2);
-  --tag-text: #b45309;
-  --accent-color: #f59e0b;
 }
 
 * {
@@ -47,7 +23,7 @@
   box-sizing: border-box;
 }
 
-/* Hide scrollbar completely across Chrome, Safari, Edge and Firefox */
+/* Hide scrollbar across all modern browsers */
 ::-webkit-scrollbar {
   display: none !important;
   width: 0 !important;
@@ -74,7 +50,7 @@ body {
 }
 
 /* ==========================================================================
-   FIXED VIEWPORT STAGE FOR PARALLAX SCENE
+   FIXED VIEWPORT STAGE FOR SEASONAL ATMOSPHERE
    ========================================================================== */
 
 .scene-container {
@@ -97,11 +73,7 @@ body {
   z-index: 1;
 }
 
-/* ==========================================================================
-   CELESTIAL SYSTEM: SUN & MOON
-   ========================================================================== */
-
-.celestial-system {
+#season-particles-canvas {
   position: absolute;
   top: 0;
   left: 0;
@@ -111,163 +83,30 @@ body {
   pointer-events: none;
 }
 
-.celestial-body {
-  position: absolute;
-  border-radius: 50%;
-  will-change: transform, opacity, filter;
-  transition: filter 0.2s linear;
-}
+/* ==========================================================================
+   WINTER CORNER FROST VIGNETTE
+   ========================================================================== */
 
-/* --- THE SUN (COMPACT & REFINED) --- */
-.sun {
-  width: 86px;
-  height: 86px;
-  left: 65%;
-  top: 22%;
-  margin-left: -43px;
-  margin-top: -43px;
-}
-
-.sun-core {
+.frost-overlay {
   position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fff7ed 40%, #fde047 80%, #f59e0b 100%);
-  box-shadow: 
-    0 0 25px 8px rgba(254, 240, 138, 0.9),
-    0 0 60px 20px rgba(245, 158, 11, 0.65),
-    0 0 100px 40px rgba(234, 88, 12, 0.35);
-}
-
-.sun-corona {
-  position: absolute;
-  top: -40%;
-  left: -40%;
-  width: 180%;
-  height: 180%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(254, 215, 170, 0.45) 0%, rgba(245, 158, 11, 0.2) 50%, transparent 75%);
-  animation: pulse-corona 6s ease-in-out infinite alternate;
-}
-
-.sun-flare-ring {
-  position: absolute;
-  top: -80%;
-  left: -80%;
-  width: 260%;
-  height: 260%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 237, 213, 0.25) 0%, rgba(251, 146, 60, 0.1) 60%, transparent 80%);
-  filter: blur(14px);
-}
-
-.sun-rays-burst {
-  position: absolute;
-  top: -120%;
-  left: -120%;
-  width: 340%;
-  height: 340%;
-  border-radius: 50%;
-  background: repeating-conic-gradient(
-    from 0deg,
-    rgba(255, 255, 255, 0.12) 0deg 15deg,
-    transparent 15deg 30deg
-  );
-  animation: rotate-rays 90s linear infinite;
-  mask-image: radial-gradient(circle, black 30%, transparent 70%);
-  -webkit-mask-image: radial-gradient(circle, black 30%, transparent 70%);
-}
-
-@keyframes rotate-rays {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes pulse-corona {
-  0% { transform: scale(0.95); opacity: 0.75; }
-  100% { transform: scale(1.08); opacity: 1; }
-}
-
-/* --- THE MOON (COMPACT & REFINED) --- */
-.moon {
-  width: 72px;
-  height: 72px;
-  left: 65%;
-  top: 22%;
-  margin-left: -36px;
-  margin-top: -36px;
+  z-index: 3;
+  pointer-events: none;
   opacity: 0;
-  transform: translate3d(0, 300px, 0);
-}
-
-.moon-core {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #f1f5f9 45%, #cbd5e1 85%, #94a3b8 100%);
-  box-shadow: 
-    0 0 20px 6px rgba(224, 242, 254, 0.85),
-    0 0 50px 20px rgba(186, 230, 253, 0.35),
-    inset -6px -6px 14px rgba(30, 41, 59, 0.45);
-  overflow: hidden;
-}
-
-/* Scaled Moon Craters */
-.crater {
-  position: absolute;
-  border-radius: 50%;
-  background: #94a3b8;
-  opacity: 0.35;
-  box-shadow: inset 1px 1px 2px rgba(15, 23, 42, 0.6), 1px 1px 1px rgba(255, 255, 255, 0.5);
-}
-.crater.c1 { width: 12px; height: 12px; top: 28%; left: 32%; }
-.crater.c2 { width: 8px; height: 8px; top: 58%; left: 24%; }
-.crater.c3 { width: 15px; height: 15px; top: 50%; left: 56%; }
-.crater.c4 { width: 7px; height: 7px; top: 22%; left: 62%; }
-.crater.c5 { width: 5px; height: 5px; top: 76%; left: 45%; }
-.crater.c6 { width: 10px; height: 10px; top: 38%; left: 48%; }
-
-.moon-maria {
-  position: absolute;
-  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-  background: #64748b;
-  opacity: 0.18;
-  filter: blur(2px);
-}
-.moon-maria.m1 { width: 34px; height: 28px; top: 15%; left: 20%; }
-.moon-maria.m2 { width: 30px; height: 22px; top: 55%; left: 40%; }
-
-.moon-glow {
-  position: absolute;
-  top: -30%;
-  left: -30%;
-  width: 160%;
-  height: 160%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(224, 242, 254, 0.35) 0%, rgba(186, 230, 253, 0.1) 60%, transparent 75%);
-  filter: blur(10px);
-}
-
-.moon-halo {
-  position: absolute;
-  top: -80%;
-  left: -80%;
-  width: 260%;
-  height: 260%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(147, 197, 253, 0.15) 0%, transparent 65%);
-  animation: pulse-moon 8s ease-in-out infinite alternate;
-}
-
-@keyframes pulse-moon {
-  0% { transform: scale(0.96); opacity: 0.7; }
-  100% { transform: scale(1.04); opacity: 1; }
+  transition: opacity 0.6s ease;
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(224, 242, 254, 0.4) 0%, transparent 40%),
+    radial-gradient(circle at 100% 0%, rgba(224, 242, 254, 0.35) 0%, transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(224, 242, 254, 0.3) 0%, transparent 35%),
+    radial-gradient(circle at 0% 100%, rgba(224, 242, 254, 0.3) 0%, transparent 35%);
+  backdrop-filter: blur(0px);
 }
 
 /* ==========================================================================
-   DAYTIME BIRDS
+   DAYTIME BIRDS (SPRING & SUMMER)
    ========================================================================== */
 
 .birds-layer {
@@ -276,7 +115,7 @@ body {
   left: 0;
   width: 100%;
   height: 35%;
-  z-index: 3;
+  z-index: 4;
   pointer-events: none;
   transition: opacity 0.6s ease;
 }
@@ -285,8 +124,6 @@ body {
   position: absolute;
   width: 24px;
   height: 14px;
-  background-repeat: no-repeat;
-  background-size: contain;
   opacity: 0.7;
 }
 
@@ -305,18 +142,9 @@ body {
 .bird-1 { top: 20%; left: -50px; animation: fly-across 26s linear infinite; animation-delay: 0s; transform: scale(0.85); }
 .bird-2 { top: 38%; left: -60px; animation: fly-across 32s linear infinite; animation-delay: 6s; transform: scale(0.65); }
 .bird-3 { top: 12%; left: -40px; animation: fly-across 29s linear infinite; animation-delay: 13s; transform: scale(1.1); }
-.bird-4 { top: 48%; left: -50px; animation: fly-across 35s linear infinite; animation-delay: 19s; transform: scale(0.55); }
-.bird-5 { top: 28%; left: -70px; animation: fly-across 24s linear infinite; animation-delay: 9s; transform: scale(0.95); }
 
-@keyframes flap-left {
-  0% { transform: rotate(-35deg); }
-  100% { transform: rotate(25deg); }
-}
-
-@keyframes flap-right {
-  0% { transform: rotate(35deg); }
-  100% { transform: rotate(-25deg); }
-}
+@keyframes flap-left { 0% { transform: rotate(-35deg); } 100% { transform: rotate(25deg); } }
+@keyframes flap-right { 0% { transform: rotate(35deg); } 100% { transform: rotate(-25deg); } }
 
 @keyframes fly-across {
   0% { transform: translateX(0vw) translateY(0px); }
@@ -330,27 +158,27 @@ body {
 
 .clouds-layer {
   position: absolute;
-  top: 10%;
+  top: 8%;
   left: 0;
   width: 100%;
-  height: 40%;
-  z-index: 4;
+  height: 45%;
+  z-index: 2;
   pointer-events: none;
   overflow: hidden;
 }
 
 .cloud {
   position: absolute;
-  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.15) 60%, transparent 80%);
-  filter: blur(12px);
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.12) 60%, transparent 80%);
+  filter: blur(14px);
   border-radius: 50%;
   will-change: transform;
 }
 
-.cloud-1 { width: 500px; height: 160px; top: 10%; left: -20%; animation: drift-cloud 75s linear infinite; }
-.cloud-2 { width: 680px; height: 210px; top: 25%; left: 30%; animation: drift-cloud 95s linear infinite; }
-.cloud-3 { width: 420px; height: 130px; top: 5%; left: 70%; animation: drift-cloud 85s linear infinite; }
-.cloud-4 { width: 560px; height: 180px; top: 35%; left: -10%; animation: drift-cloud 110s linear infinite; }
+.cloud-1 { width: 520px; height: 160px; top: 10%; left: -20%; animation: drift-cloud 75s linear infinite; }
+.cloud-2 { width: 700px; height: 220px; top: 25%; left: 30%; animation: drift-cloud 95s linear infinite; }
+.cloud-3 { width: 440px; height: 140px; top: 5%; left: 70%; animation: drift-cloud 85s linear infinite; }
+.cloud-4 { width: 580px; height: 190px; top: 35%; left: -10%; animation: drift-cloud 110s linear infinite; }
 
 @keyframes drift-cloud {
   0% { transform: translateX(-40vw); }
@@ -363,15 +191,15 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 7;
+  z-index: 5;
   pointer-events: none;
-  background: radial-gradient(circle at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+  background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.3) 100%);
   mix-blend-mode: multiply;
-  opacity: 0.3;
+  opacity: 0.25;
 }
 
 /* ==========================================================================
-   FLOATING HUD / NAVIGATION BAR
+   FLOATING HUD & SEASON SELECTOR
    ========================================================================== */
 
 .hud-header {
@@ -379,11 +207,11 @@ body {
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(92%, 1100px);
-  padding: 12px 24px;
+  width: min(94%, 1150px);
+  padding: 10px 22px;
   background: var(--card-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--card-border);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   border-radius: 9999px;
@@ -391,8 +219,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  gap: 14px;
+  transition: all 0.4s ease;
 }
 
 .hud-brand {
@@ -402,22 +230,23 @@ body {
   font-family: 'Cinzel', serif;
   font-weight: 700;
   font-size: 1.05rem;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.12em;
   color: var(--text-main);
   white-space: nowrap;
 }
 
 .hud-icon {
   font-size: 1.25rem;
+  transition: transform 0.3s ease;
 }
 
 .hud-status {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   flex: 1;
-  max-width: 440px;
-  margin: 0 16px;
+  max-width: 380px;
+  margin: 0 12px;
 }
 
 .status-badge {
@@ -429,8 +258,7 @@ body {
   background: var(--tag-bg);
   color: var(--tag-text);
   font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -460,7 +288,7 @@ body {
 .scroll-meter-bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #f59e0b, #ec4899, #6366f1);
+  background: linear-gradient(90deg, #ec4899, #f59e0b, #ea580c, #38bdf8);
   border-radius: 9999px;
   transition: width 0.1s linear;
 }
@@ -472,17 +300,49 @@ body {
   min-width: 38px;
 }
 
+/* Season quick tabs */
+.season-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 3px 6px;
+  border-radius: 9999px;
+}
+
+.season-tab {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+  line-height: 1;
+}
+
+.season-tab:hover {
+  transform: scale(1.15);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.season-tab.active {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: scale(1.1);
+}
+
 .hud-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .hud-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 16px;
+  padding: 6px 14px;
   border-radius: 9999px;
   border: 1px solid var(--card-border);
   background: rgba(255, 255, 255, 0.5);
@@ -497,11 +357,10 @@ body {
 .hud-btn:hover {
   background: rgba(255, 255, 255, 0.85);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* ==========================================================================
-   SCROLLABLE STORY CONTENT (DOCKED ON LEFT FOR UNOBSTRUCTED CELESTIAL VIEW)
+   SCROLLABLE STORY CONTENT (DOCKED ON LEFT FOR PANORAMIC VIEW)
    ========================================================================== */
 
 .content-wrapper {
@@ -512,7 +371,7 @@ body {
   padding-left: 6vw;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Completely off-center to the left! */
+  align-items: flex-start;
   gap: 45vh;
   width: 100%;
   max-width: 1440px;
@@ -521,7 +380,6 @@ body {
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
-/* Cinematic Clean View mode */
 body.clean-view .content-wrapper {
   opacity: 0;
   pointer-events: none;
@@ -529,8 +387,8 @@ body.clean-view .content-wrapper {
 }
 
 .story-section {
-  width: min(88vw, 420px); /* Compact readable width */
-  min-height: 40vh;
+  width: min(88vw, 440px);
+  min-height: 45vh;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -538,12 +396,12 @@ body.clean-view .content-wrapper {
 
 .story-card {
   width: 100%;
-  padding: 34px 28px;
-  border-radius: 24px;
+  padding: 38px 32px;
+  border-radius: 28px;
   pointer-events: auto;
   background: var(--card-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
   border: 1px solid var(--card-border);
   box-shadow: var(--card-shadow);
   transition: transform 0.3s ease, background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
@@ -559,44 +417,44 @@ body.clean-view .content-wrapper {
   border-radius: 9999px;
   background: var(--tag-bg);
   color: var(--tag-text);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   transition: all 0.4s ease;
 }
 
 .story-title {
   font-family: 'Cinzel', serif;
-  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-size: clamp(2rem, 4.5vw, 2.8rem);
   font-weight: 800;
   line-height: 1.15;
   color: var(--text-main);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   letter-spacing: -0.01em;
 }
 
 .story-heading {
   font-family: 'Cinzel', serif;
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-size: clamp(1.8rem, 3.8vw, 2.4rem);
   font-weight: 700;
   line-height: 1.2;
   color: var(--text-main);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .story-lead {
-  font-size: 1.25rem;
-  line-height: 1.7;
+  font-size: 1.05rem;
+  line-height: 1.75;
   color: var(--text-muted);
   font-weight: 400;
-  margin-bottom: 32px;
+  margin-bottom: 16px;
 }
 
 .story-card p {
-  font-size: 1.05rem;
-  line-height: 1.8;
+  font-size: 0.95rem;
+  line-height: 1.75;
   color: var(--text-muted);
   margin-bottom: 20px;
 }
@@ -604,16 +462,16 @@ body.clean-view .content-wrapper {
 .scroll-prompt {
   display: flex;
   align-items: center;
-  gap: 14px;
-  font-size: 0.9rem;
+  gap: 12px;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-muted);
-  margin-top: 10px;
+  margin-top: 14px;
 }
 
 .mouse-icon {
-  width: 24px;
-  height: 38px;
+  width: 22px;
+  height: 34px;
   border: 2px solid var(--text-muted);
   border-radius: 12px;
   position: relative;
@@ -621,7 +479,7 @@ body.clean-view .content-wrapper {
 
 .wheel {
   width: 4px;
-  height: 8px;
+  height: 6px;
   background: var(--accent-color);
   border-radius: 2px;
   position: absolute;
@@ -633,96 +491,47 @@ body.clean-view .content-wrapper {
 
 @keyframes scroll-wheel {
   0% { opacity: 1; transform: translate(-50%, 0); }
-  100% { opacity: 0; transform: translate(-50%, 14px); }
-}
-
-.poetic-quote {
-  border-left: 3px solid var(--accent-color);
-  padding: 16px 22px;
-  margin: 28px 0;
-  font-style: italic;
-  font-size: 1.15rem;
-  line-height: 1.65;
-  color: var(--text-main);
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 0 16px 16px 0;
+  100% { opacity: 0; transform: translate(-50%, 12px); }
 }
 
 .feature-pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 24px;
+  gap: 8px;
+  margin-top: 18px;
 }
 
 .pill {
-  padding: 8px 18px;
+  padding: 6px 14px;
   border-radius: 9999px;
   background: rgba(0, 0, 0, 0.05);
   border: 1px solid var(--card-border);
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-main);
   backdrop-filter: blur(8px);
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-val {
-  font-family: 'Cinzel', serif;
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-.stat-lbl {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-top: 4px;
-}
-
 .action-buttons {
-  margin: 32px 0 16px;
+  margin: 24px 0 8px;
 }
 
 .action-btn {
-  padding: 14px 28px;
+  padding: 12px 24px;
   border-radius: 9999px;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   border: none;
   cursor: pointer;
-  background: linear-gradient(135deg, #f59e0b, #ea580c);
+  background: linear-gradient(135deg, #38bdf8, #6366f1);
   color: #ffffff;
-  box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 8px 20px rgba(56, 189, 248, 0.35);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .action-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(245, 158, 11, 0.55);
-}
-
-.footer-note {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-top: 24px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  padding-top: 16px;
+  box-shadow: 0 12px 25px rgba(56, 189, 248, 0.5);
 }
 
 /* ==========================================================================
@@ -732,29 +541,16 @@ body.clean-view .content-wrapper {
 @media (max-width: 768px) {
   .hud-header {
     width: 95%;
-    padding: 10px 16px;
+    padding: 8px 14px;
   }
   .hud-status {
-    display: none; /* Hide progress bar on small phones for a clean HUD */
+    display: none;
+  }
+  .content-wrapper {
+    padding-left: 4vw;
   }
   .story-card {
-    padding: 30px 22px;
-    border-radius: 24px;
-  }
-  .stats-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  .sun {
-    width: 130px;
-    height: 130px;
-    margin-left: -65px;
-    margin-top: -65px;
-  }
-  .moon {
-    width: 110px;
-    height: 110px;
-    margin-left: -55px;
-    margin-top: -55px;
+    padding: 26px 20px;
+    border-radius: 20px;
   }
 }

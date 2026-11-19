@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Celestial Horizons | Day to Night Mountain Journey</title>
+  <title>Four Seasons | Spring, Summer, Autumn & Winter</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -11,54 +11,31 @@
 </head>
 <body>
 
-  <!-- FIXED PARALLAX SKY & MOUNTAIN SCENERY -->
+  <!-- FIXED PARALLAX SEASONAL STAGE -->
   <div id="scene-container" class="scene-container">
-    <!-- Dynamic Sky Canvas for Gradients, Sunbeams, Stars & Aurora -->
+    <!-- Dynamic Sky Canvas (Spring Pastels -> Summer Azure -> Autumn Amber -> Winter Frost) -->
     <canvas id="sky-canvas"></canvas>
 
-    <!-- Celestial Sphere Container -->
-    <div id="celestial-system" class="celestial-system">
-      <!-- THE SUN -->
-      <div id="sun-element" class="celestial-body sun">
-        <div class="sun-core"></div>
-        <div class="sun-corona"></div>
-        <div class="sun-flare-ring"></div>
-        <div class="sun-rays-burst"></div>
-      </div>
+    <!-- Interactive Seasonal Particle Engine (Petals, Sun Motes, Falling Leaves, Snowflakes) -->
+    <canvas id="season-particles-canvas"></canvas>
 
-      <!-- THE MOON -->
-      <div id="moon-element" class="celestial-body moon">
-        <div class="moon-core">
-          <div class="crater c1"></div>
-          <div class="crater c2"></div>
-          <div class="crater c3"></div>
-          <div class="crater c4"></div>
-          <div class="crater c5"></div>
-          <div class="crater c6"></div>
-          <div class="moon-maria m1"></div>
-          <div class="moon-maria m2"></div>
-        </div>
-        <div class="moon-glow"></div>
-        <div class="moon-halo"></div>
-      </div>
-    </div>
-
-    <!-- DAYTIME BIRDS LAYER -->
-    <div id="birds-layer" class="birds-layer">
-      <div class="bird bird-1"></div>
-      <div class="bird bird-2"></div>
-      <div class="bird bird-3"></div>
-      <div class="bird bird-4"></div>
-      <div class="bird bird-5"></div>
-    </div>
-
-    <!-- DRIFTING CLOUDS / VALLEY MIST -->
+    <!-- DRIFTING CLOUDS / SEASONAL HAZE -->
     <div id="clouds-layer" class="clouds-layer">
       <div class="cloud cloud-1"></div>
       <div class="cloud cloud-2"></div>
       <div class="cloud cloud-3"></div>
       <div class="cloud cloud-4"></div>
     </div>
+
+    <!-- SOARING BIRDS (ACTIVE IN SPRING & SUMMER) -->
+    <div id="birds-layer" class="birds-layer">
+      <div class="bird bird-1"></div>
+      <div class="bird bird-2"></div>
+      <div class="bird bird-3"></div>
+    </div>
+
+    <!-- WINTER CORNER FROST VIGNETTE -->
+    <div id="frost-overlay" class="frost-overlay"></div>
 
     <!-- AMBIENT LIGHTING OVERLAY -->
     <div id="ambient-overlay" class="ambient-overlay"></div>
@@ -67,19 +44,27 @@
   <!-- FIXED FLOATING STATUS BAR & HUD -->
   <header class="hud-header">
     <div class="hud-brand">
-      <span class="hud-icon">☀️</span>
-      <span class="hud-title">SOLARIS &bull; LUNA</span>
+      <span class="hud-icon" id="brand-icon">🌸</span>
+      <span class="hud-title">FOUR SEASONS</span>
     </div>
 
     <div class="hud-status">
-      <div class="status-badge" id="time-badge">
+      <div class="status-badge" id="season-badge">
         <span class="status-dot"></span>
-        <span id="time-text">High Summer Noon</span>
+        <span id="season-text">Spring Awakening</span>
       </div>
       <div class="scroll-meter-wrap">
         <div class="scroll-meter-bar" id="scroll-meter"></div>
       </div>
       <span id="progress-percent" class="progress-percent">0%</span>
+    </div>
+
+    <!-- SEASON SELECTOR BUTTONS -->
+    <div class="season-selector">
+      <button class="season-tab active" data-target="sec-spring" title="Spring">🌸</button>
+      <button class="season-tab" data-target="sec-summer" title="Summer">☀️</button>
+      <button class="season-tab" data-target="sec-autumn" title="Autumn">🍂</button>
+      <button class="season-tab" data-target="sec-winter" title="Winter">❄️</button>
     </div>
 
     <div class="hud-actions">
@@ -89,117 +74,96 @@
       </button>
       <button id="sound-btn" class="hud-btn" title="Toggle Ambient Soundscape">
         <span class="btn-icon">🔊</span>
-        <span class="btn-label">Ambiance</span>
-      </button>
-      <button id="time-toggle-btn" class="hud-btn" title="Quick Jump Day / Night">
-        <span class="btn-icon">🌗</span>
-        <span class="btn-label">Shift</span>
+        <span class="btn-label">Sound</span>
       </button>
     </div>
   </header>
 
-  <!-- SCROLLABLE STORY CONTENT -->
+  <!-- SCROLLABLE SEASONAL STORY CONTENT (LEFT-DOCKED FOR PANORAMIC CLARITY) -->
   <main class="content-wrapper" id="content">
     
-    <!-- HERO SECTION (DAYTIME GLORY) -->
-    <section class="story-section section-hero" id="sec-dawn">
-      <div class="story-card glass">
-        <div class="section-tag">Phase I &bull; 12:00 PM</div>
-        <h1 class="story-title">Summer's Golden Zenith</h1>
+    <!-- SEASON 1: SPRING (0% - 25%) -->
+    <section class="story-section" id="sec-spring">
+      <div class="story-card glass spring-theme">
+        <div class="section-tag">Season I &bull; Vernal Equinox</div>
+        <h1 class="story-title">Spring's Verdant Rebirth</h1>
         <p class="story-lead">
-          Bathed in blinding radiant warmth, the towering peaks kiss the azure sky. The sun presides over alpine meadows alive with vibrant breeze and golden rays.
+          The cold slumber of the earth dissolves into a vibrant symphony of life. Gentle pastel skies greet drifting cherry blossom petals carried upon balmy morning breezes.
         </p>
+        <p>
+          Streams awaken with melting mountain waters, and fresh emerald shoots unfurl beneath a soft golden dawn. The world breathes anew with boundless hope.
+        </p>
+        <div class="feature-pills">
+          <span class="pill">🌸 Cherry Petals</span>
+          <span class="pill">🌱 Fresh Sprout</span>
+          <span class="pill">🕊️ Songbirds</span>
+        </div>
         <div class="scroll-prompt">
-          <span>Scroll down to awaken the cosmos</span>
-          <div class="mouse-icon">
-            <div class="wheel"></div>
-          </div>
+          <span>Scroll down to journey into Summer</span>
+          <div class="mouse-icon"><div class="wheel"></div></div>
         </div>
       </div>
     </section>
 
-    <!-- SECTION 2: AFTERNOON TO GOLDEN HOUR -->
-    <section class="story-section" id="sec-afternoon">
-      <div class="story-card glass">
-        <div class="section-tag">Phase II &bull; 04:30 PM</div>
-        <h2 class="story-heading">The Sun's Ascendant Arc</h2>
-        <p>
-          As you read and venture deeper, the golden rays begin their grand celestial flight. The sun rises high, illuminating the high granite towers before making its long arc toward the unseen western rim.
-        </p>
-        <blockquote class="poetic-quote">
-          "The mountain does not move, yet in its quiet granite eyes, the entire universe dances from brilliant light into velvet mystery."
-        </blockquote>
-        <div class="feature-pills">
-          <span class="pill">☀️ Warm Solar Rays</span>
-          <span class="pill">🍃 Alpine Wind</span>
-          <span class="pill">🦅 Eagles Soaring</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 3: TWILIGHT & SUNSET TRANSITION -->
-    <section class="story-section" id="sec-twilight">
-      <div class="story-card glass">
-        <div class="section-tag">Phase III &bull; 07:45 PM</div>
-        <h2 class="story-heading">The Twilight Threshold</h2>
-        <p>
-          Daylight yields gracefully. The fiery amber horizon dissolves into deep violet and lavender haze. Shadows stretch across the quiet valleys, and the crisp bite of mountain dusk cools the earth.
+    <!-- SEASON 2: SUMMER (25% - 50%) -->
+    <section class="story-section" id="sec-summer">
+      <div class="story-card glass summer-theme">
+        <div class="section-tag">Season II &bull; Summer Solstice</div>
+        <h2 class="story-heading">Summer's Golden Radiance</h2>
+        <p class="story-lead">
+          The celestial canopy expands into endless, vibrant cerulean azure. Drenched in radiant golden warmth, the earth reaches its triumphant zenith of life.
         </p>
         <p>
-          Watch the sun ascend past the horizon while the first silver glimmer of the nocturnal crown ascends in quiet majesty. The world holds its breath between two realms.
-        </p>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-val">3,850m</span>
-            <span class="stat-lbl">Peak Elevation</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-val">100%</span>
-            <span class="stat-lbl">Smooth Lerp</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-val">2.8k</span>
-            <span class="stat-lbl">Twinkling Stars</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 4: THE DEEP MOONLIT NIGHT -->
-    <section class="story-section" id="sec-night">
-      <div class="story-card glass night-card">
-        <div class="section-tag">Phase IV &bull; 11:30 PM</div>
-        <h2 class="story-heading">The Silver Moon's Dominion</h2>
-        <p>
-          The sun has retreated and the velvet obsidian firmament has arrived. In its place, the pearl-white Moon rises high, casting sharp silvery luminescence along the snowy ridgelines.
-        </p>
-        <p>
-          Constellations sparkle through the crystal-clear alpine atmosphere. Cool mountain night winds sweep across the ridges, and shooting stars streak silently across the cosmic canvas.
+          Sunlight shimmers in dancing shafts through lush green canopies. Golden pollen drifts through the warm afternoon air, and long balmy twilights stretch toward endless horizons.
         </p>
         <div class="feature-pills">
-          <span class="pill">🌕 Lunar Radiance</span>
-          <span class="pill">✨ Starfield Nebula</span>
-          <span class="pill">🌠 Meteor Showers</span>
+          <span class="pill">☀️ Solar Warmth</span>
+          <span class="pill">🌊 Azure Sky</span>
+          <span class="pill">🌻 Golden Zenith</span>
         </div>
       </div>
     </section>
 
-    <!-- SECTION 5: CELESTIAL EQUILIBRIUM -->
-    <section class="story-section" id="sec-eternal">
-      <div class="story-card glass final-card">
-        <div class="section-tag">The Infinite Cycle</div>
-        <h2 class="story-heading">Eternity in Motion</h2>
-        <p>
-          Light and dark are not adversaries, but partners in an eternal waltz over timeless stone. Scroll back upwards at your leisure to watch the dawn bloom anew, driving the night back into slumber.
+    <!-- SEASON 3: AUTUMN / FALL (50% - 75%) -->
+    <section class="story-section" id="sec-autumn">
+      <div class="story-card glass autumn-theme">
+        <div class="section-tag">Season III &bull; Autumnal Harvest</div>
+        <h2 class="story-heading">Autumn's Amber Waltz</h2>
+        <p class="story-lead">
+          Daylight yields into rich burnt orange, russet crimson, and burnished copper. The great forest ignites into a breathtaking spectacle of falling leaves dancing upon crisp autumn winds.
         </p>
+        <p>
+          A cool fragrance of pine and damp earth fills the twilight. Watch the golden leaves tumble and swirl, celebrating the timeless cycle of harvest and transition.
+        </p>
+        <div class="feature-pills">
+          <span class="pill">🍁 Swirling Foliage</span>
+          <span class="pill">🍂 Harvest Amber</span>
+          <span class="pill">🌾 Crisp Dusk</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEASON 4: WINTER (75% - 100%) -->
+    <section class="story-section" id="sec-winter">
+      <div class="story-card glass winter-theme">
+        <div class="section-tag">Season IV &bull; Winter Solstice</div>
+        <h2 class="story-heading">Winter's Boreal Stillness</h2>
+        <p class="story-lead">
+          A tranquil serenity descends upon the world. The sky transforms into deep glacial sapphire and twilight indigo, while soft crystalline snowflakes drift silently from the heavens.
+        </p>
+        <p>
+          The restless earth rests in majestic stillness beneath a shimmering blanket of white. Starlight glints through frost-laden air, awaiting the cycle to begin once more.
+        </p>
+        <div class="feature-pills">
+          <span class="pill">❄️ Falling Snow</span>
+          <span class="pill">🧊 Glacial Frost</span>
+          <span class="pill">🌌 Cosmic Stillness</span>
+        </div>
         <div class="action-buttons">
           <button class="action-btn primary" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-            ▲ Return to Summer Sun
+            ▲ Return to Spring
           </button>
         </div>
-        <footer class="footer-note">
-          Designed with pure CSS & Canvas &bull; Responsive, fluid scroll-driven celestial mechanics
-        </footer>
       </div>
     </section>
 
