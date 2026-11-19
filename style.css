@@ -358,7 +358,7 @@ body {
 }
 
 /* ==========================================================================
-   REAL PHOTOGRAPHIC MOUNTAINS CONTAINER
+   ANIMATED MULTI-LAYER MOUNTAIN HORIZON
    ========================================================================== */
 
 .mountains-container {
@@ -366,9 +366,9 @@ body {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 30vh;
-  min-height: 180px;
-  max-height: 260px;
+  height: 32vh;
+  min-height: 200px;
+  max-height: 280px;
   z-index: 5;
   pointer-events: none;
   overflow: hidden;
@@ -377,40 +377,102 @@ body {
   justify-content: center;
 }
 
-.real-mountain {
+.mountain-anim-layer {
   position: absolute;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  min-width: 1300px;
-  height: 100%;
-  object-fit: cover;
+  min-width: 1200px;
+  pointer-events: none;
+}
+
+.mountain-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
   object-position: bottom center;
   pointer-events: none;
-  z-index: 1;
-  will-change: filter;
+  will-change: filter, transform;
   transition: filter 0.2s linear;
 }
 
-.mountain-light-overlay {
+/* Layer 1: Distant Grand Peak with subtle atmospheric drift */
+.layer-distant-wrap {
+  z-index: 1;
+  bottom: 35px;
+  opacity: 0.92;
+  animation: mountain-drift-back 34s ease-in-out infinite alternate;
+}
+.mountain-distant {
+  max-height: 240px;
+}
+
+@keyframes mountain-drift-back {
+  0%   { transform: translateX(-50%) translateY(0px) scale(1); }
+  50%  { transform: translateX(-48%) translateY(-4px) scale(1.02); }
+  100% { transform: translateX(-52%) translateY(0px) scale(1); }
+}
+
+/* Layer 2: Mid-Range Alpine Massif with opposing drift & light sweep */
+.layer-mid-wrap {
+  z-index: 3;
+  bottom: 12px;
+  animation: mountain-drift-mid 24s ease-in-out infinite alternate;
+}
+.mountain-mid {
+  max-height: 220px;
+}
+
+@keyframes mountain-drift-mid {
+  0%   { transform: translateX(-50%) translateY(0px); }
+  50%  { transform: translateX(-52.5%) translateY(-2px); }
+  100% { transform: translateX(-47.5%) translateY(0px); }
+}
+
+/* Animated Ridge Light Sweep across the summits */
+.ridge-light-sweep {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 50%;
   pointer-events: none;
-  z-index: 2;
-  mix-blend-mode: soft-light;
-  transition: opacity 0.3s linear;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.25) 45%,
+    rgba(254, 240, 138, 0.45) 50%,
+    transparent 55%
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+  animation: ridge-sheen 9s ease-in-out infinite;
 }
 
-/* ANIMATED VOLUMETRIC VALLEY MIST OVER REAL MOUNTAINS */
+@keyframes ridge-sheen {
+  0%   { transform: translateX(-80%); opacity: 0; }
+  25%  { opacity: 0.75; }
+  50%  { transform: translateX(80%); opacity: 0; }
+  100% { transform: translateX(80%); opacity: 0; }
+}
+
+/* Layer 3: Foreground Foothills anchored solidly at base */
+.layer-fore-wrap {
+  z-index: 5;
+  bottom: -2px;
+}
+.mountain-fore {
+  max-height: 140px;
+}
+
+/* Volumetric Valley Mist Waves */
 .alpine-mist {
   position: absolute;
   pointer-events: none;
-  background: radial-gradient(ellipse at 50% 60%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.08) 50%, transparent 75%);
-  filter: blur(18px);
+  background: radial-gradient(ellipse at 50% 60%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.08) 50%, transparent 75%);
+  filter: blur(16px);
   will-change: transform;
   border-radius: 50%;
 }
@@ -420,17 +482,17 @@ body {
   left: -20%;
   width: 140%;
   height: 55px;
-  bottom: 18%;
+  bottom: 25px;
   opacity: 0.5;
   animation: drift-mist-1 32s ease-in-out infinite alternate;
 }
 
 .mist-layer-front {
-  z-index: 3;
+  z-index: 4;
   left: -10%;
   width: 120%;
-  height: 45px;
-  bottom: 5%;
+  height: 40px;
+  bottom: 8px;
   opacity: 0.35;
   animation: drift-mist-2 42s ease-in-out infinite alternate;
 }
@@ -445,6 +507,19 @@ body {
   0% { transform: translateX(10%) scaleY(1); }
   50% { transform: translateX(-5%) scaleY(1.25); }
   100% { transform: translateX(-15%) scaleY(1); }
+}
+
+/* Dynamic Celestial Lighting Overlay across all mountain layers */
+.mountain-light-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 6;
+  mix-blend-mode: soft-light;
+  transition: opacity 0.3s linear, background 0.3s linear;
 }
 
 .ambient-overlay {

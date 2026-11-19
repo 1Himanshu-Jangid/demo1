@@ -90,7 +90,7 @@ function getInterpolatedPalette(p) {
 const skyCanvas = document.getElementById('sky-canvas');
 const skyCtx = skyCanvas.getContext('2d', { alpha: false });
 
-const realMountainEl = document.getElementById('real-mountain');
+const mountainImgs = document.querySelectorAll('.mountain-img');
 const mountainLightOverlay = document.getElementById('mountain-light-overlay');
 const sunEl = document.getElementById('sun-element');
 const moonEl = document.getElementById('moon-element');
@@ -266,7 +266,9 @@ function renderSky(palette, p) {
 // ==========================================================================
 
 function updateRealMountainLighting(p) {
-  if (!realMountainEl) return;
+  if (!mountainImgs || mountainImgs.length === 0) return;
+  
+  let filterStr = '';
   if (p < 0.5) {
     // Summer Daytime -> Warm Golden Hour
     const t = p / 0.5;
@@ -275,7 +277,7 @@ function updateRealMountainLighting(p) {
     const sat = lerp(1.15, 1.35, t);
     const hue = lerp(0, -18, t);
     const glow = (1 - t) * 22;
-    realMountainEl.style.filter = `brightness(${bright.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${sat.toFixed(2)}) hue-rotate(${hue.toFixed(1)}deg) drop-shadow(0 0 ${glow}px rgba(254, 240, 138, 0.35))`;
+    filterStr = `brightness(${bright.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${sat.toFixed(2)}) hue-rotate(${hue.toFixed(1)}deg) drop-shadow(0 0 ${glow}px rgba(254, 240, 138, 0.35))`;
     
     // Directional Sun Glow on the Mountain Face
     if (mountainLightOverlay) {
@@ -290,7 +292,7 @@ function updateRealMountainLighting(p) {
     const sat = lerp(1.35, 0.55, nightT);
     const hue = lerp(-18, 185, nightT);
     const moonGlow = nightT * 25;
-    realMountainEl.style.filter = `brightness(${bright.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${sat.toFixed(2)}) hue-rotate(${hue.toFixed(1)}deg) drop-shadow(0 0 ${moonGlow}px rgba(186, 230, 253, 0.45))`;
+    filterStr = `brightness(${bright.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${sat.toFixed(2)}) hue-rotate(${hue.toFixed(1)}deg) drop-shadow(0 0 ${moonGlow}px rgba(186, 230, 253, 0.45))`;
     
     // Cool Lunar Glow on Mountain Ridges
     if (mountainLightOverlay) {
@@ -298,6 +300,10 @@ function updateRealMountainLighting(p) {
       mountainLightOverlay.style.background = `radial-gradient(ellipse at 70% 0%, rgba(224, 242, 254, ${moonAlpha.toFixed(2)}) 0%, rgba(30, 58, 138, ${(moonAlpha * 0.5).toFixed(2)}) 55%, transparent 85%)`;
     }
   }
+
+  mountainImgs.forEach(img => {
+    img.style.filter = filterStr;
+  });
 }
 
 function updateCelestialPositions(p) {
