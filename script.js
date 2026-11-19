@@ -1,6 +1,7 @@
 /**
  * CELESTIAL HORIZONS - DAY TO NIGHT SCROLL ENGINE
  * Pure Vanilla JavaScript & HTML5 Canvas
+ * Optimized for 60/120+ FPS Silky-Smooth Scrolling
  */
 
 // Helper color interpolation utilities
@@ -38,11 +39,11 @@ function lerpColor(c1, c2, t) {
 
 // Multi-stop gradient color palette based on scroll progress (0.0: Noon -> 1.0: Midnight)
 const skyStops = {
-  // 0.0: High Summer Noon
+  // 0.0: High Summer Noon (Bright Azure & Golden Horizon)
   0.0: {
-    top: '#38bdf8', // Azure Sky
-    mid: '#7dd3fc', // Light Blue
-    bot: '#fef08a', // Warm Golden Sunshine Horizon
+    top: '#38bdf8',
+    mid: '#7dd3fc',
+    bot: '#fef08a',
     distTop: '#93c5fd', distBot: '#bfdbfe',
     midTop: '#3b82f6', midBot: '#60a5fa',
     nearTop: '#1d4ed8', nearBot: '#2563eb',
@@ -58,7 +59,7 @@ const skyStops = {
     nearTop: '#312e81', nearBot: '#3730a3',
     foreTop: '#1e1b4b', foreBot: '#0f172a'
   },
-  // 0.65: Sunset / Twilight (Vivid Crimson & Purple)
+  // 0.65: Sunset / Twilight (Vivid Crimson & Royal Violet)
   0.65: {
     top: '#311042',
     mid: '#9a1b5d',
@@ -72,7 +73,7 @@ const skyStops = {
   1.0: {
     top: '#020617', // Obsidian Black
     mid: '#090d16', // Deep Midnight
-    bot: '#0f172a', // Dark Starry Horizon
+    bot: '#0f172a', // Starry Horizon
     distTop: '#1e293b', distBot: '#0f172a',
     midTop: '#131b2e', midBot: '#0a0f1d',
     nearTop: '#0b1120', nearBot: '#060a12',
@@ -111,9 +112,7 @@ function getInterpolatedPalette(p) {
 
 // DOM Elements
 const skyCanvas = document.getElementById('sky-canvas');
-const skyCtx = skyCanvas.getContext('2d');
-const particlesCanvas = document.getElementById('particles-canvas');
-const partCtx = particlesCanvas.getContext('2d');
+const skyCtx = skyCanvas.getContext('2d', { alpha: false });
 
 const sunEl = document.getElementById('sun-element');
 const moonEl = document.getElementById('moon-element');
@@ -125,13 +124,17 @@ const timeText = document.getElementById('time-text');
 const soundBtn = document.getElementById('sound-btn');
 const timeToggleBtn = document.getElementById('time-toggle-btn');
 
-// Mountain layers for parallax
-const layerDistant = document.querySelector('.layer-distant');
-const layerMid = document.querySelector('.layer-mid');
-const layerNear = document.querySelector('.layer-near');
-const layerForeground = document.querySelector('.layer-foreground');
+// Direct SVG Stop Element references for zero-layout-shift instant recoloring
+const stopDistTop = document.querySelector('.stop-distant-top');
+const stopDistBot = document.querySelector('.stop-distant-bot');
+const stopMidTop  = document.querySelector('.stop-mid-top');
+const stopMidBot  = document.querySelector('.stop-mid-bot');
+const stopNearTop = document.querySelector('.stop-near-top');
+const stopNearBot = document.querySelector('.stop-near-bot');
+const stopForeTop = document.querySelector('.stop-fore-top');
+const stopForeBot = document.querySelector('.stop-fore-bot');
 
-// Dynamic Starfield Generation
+// Dynamic Starfield Generation (No green dots - pure crisp white/cyan cosmic stars)
 const STARS_COUNT = 320;
 const stars = [];
 
@@ -142,10 +145,10 @@ function initStars() {
   for (let i = 0; i < STARS_COUNT; i++) {
     stars.push({
       x: Math.random() * w,
-      y: Math.random() * (h * 0.75), // Upper 75% of sky
-      size: Math.random() * 2 + 0.5,
+      y: Math.random() * (h * 0.72), // Upper 72% of sky
+      size: Math.random() * 1.8 + 0.6,
       baseAlpha: Math.random() * 0.7 + 0.3,
-      twinkleSpeed: Math.random() * 0.05 + 0.015,
+      twinkleSpeed: Math.random() * 0.04 + 0.015,
       phase: Math.random() * Math.PI * 2
     });
   }
@@ -160,31 +163,10 @@ function spawnMeteor() {
     meteors.push({
       x: Math.random() * w * 0.8,
       y: Math.random() * h * 0.35,
-      len: Math.random() * 90 + 50,
+      len: Math.random() * 80 + 40,
       speed: Math.random() * 12 + 10,
       angle: Math.PI / 4 + (Math.random() - 0.5) * 0.2,
       opacity: 1
-    });
-  }
-}
-
-// Night Fireflies
-const FIREFLIES_COUNT = 45;
-const fireflies = [];
-function initFireflies() {
-  fireflies.length = 0;
-  const w = particlesCanvas.width;
-  const h = particlesCanvas.height;
-  for (let i = 0; i < FIREFLIES_COUNT; i++) {
-    fireflies.push({
-      x: Math.random() * w,
-      y: h * 0.6 + Math.random() * (h * 0.4),
-      baseX: Math.random() * w,
-      baseY: h * 0.65 + Math.random() * (h * 0.3),
-      size: Math.random() * 3 + 1.5,
-      angle: Math.random() * Math.PI * 2,
-      speed: Math.random() * 0.03 + 0.01,
-      range: Math.random() * 40 + 20
     });
   }
 }
@@ -193,10 +175,7 @@ function initFireflies() {
 function handleResize() {
   skyCanvas.width = window.innerWidth;
   skyCanvas.height = window.innerHeight;
-  particlesCanvas.width = window.innerWidth;
-  particlesCanvas.height = window.innerHeight;
   initStars();
-  initFireflies();
 }
 window.addEventListener('resize', handleResize);
 handleResize();
@@ -225,9 +204,6 @@ function getTimeLabel(p) {
   return 'Starry Midnight';
 }
 
-// Main Render Loop
-let animFrameTime = 0;
-
 function renderSky(palette, p) {
   const w = skyCanvas.width;
   const h = skyCanvas.height;
@@ -235,7 +211,7 @@ function renderSky(palette, p) {
   // 1. Draw Sky Gradient
   const grad = skyCtx.createLinearGradient(0, 0, 0, h);
   grad.addColorStop(0, palette.top);
-  grad.addColorStop(0.55, palette.mid);
+  grad.addColorStop(0.52, palette.mid);
   grad.addColorStop(1, palette.bot);
   skyCtx.fillStyle = grad;
   skyCtx.fillRect(0, 0, w, h);
@@ -251,8 +227,8 @@ function renderSky(palette, p) {
     skyCtx.fillRect(0, 0, w, h);
   }
 
-  // 3. Stars Rendering (Fades in as progress exceeds 0.4)
-  const starAlpha = Math.max(0, Math.min(1, (p - 0.4) / 0.5));
+  // 3. Stars Rendering (Fades in smoothly as progress exceeds 0.4)
+  const starAlpha = Math.max(0, Math.min(1, (p - 0.4) / 0.45));
   if (starAlpha > 0) {
     skyCtx.save();
     for (let i = 0; i < stars.length; i++) {
@@ -286,133 +262,103 @@ function renderSky(palette, p) {
 
       meteor.x += Math.cos(meteor.angle) * meteor.speed;
       meteor.y += Math.sin(meteor.angle) * meteor.speed;
-      meteor.opacity -= 0.02;
+      meteor.opacity -= 0.025;
       if (meteor.opacity <= 0) meteors.splice(m, 1);
     }
     skyCtx.restore();
   }
 }
 
-function renderFireflies(p) {
-  partCtx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
-  const flyAlpha = Math.max(0, Math.min(1, (p - 0.6) / 0.35));
-  if (flyAlpha <= 0) return;
-
-  partCtx.save();
-  for (let f of fireflies) {
-    f.angle += f.speed;
-    f.x = f.baseX + Math.cos(f.angle) * f.range;
-    f.y = f.baseY + Math.sin(f.angle * 1.5) * (f.range * 0.6);
-
-    const glow = Math.sin(f.angle * 2.5) * 0.4 + 0.6;
-    const radial = partCtx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.size * 3.5);
-    radial.addColorStop(0, `rgba(167, 243, 208, ${glow * flyAlpha})`);
-    radial.addColorStop(0.4, `rgba(52, 211, 153, ${glow * 0.6 * flyAlpha})`);
-    radial.addColorStop(1, 'transparent');
-
-    partCtx.fillStyle = radial;
-    partCtx.beginPath();
-    partCtx.arc(f.x, f.y, f.size * 3.5, 0, Math.PI * 2);
-    partCtx.fill();
-  }
-  partCtx.restore();
-}
-
 function updateCelestialPositions(p) {
   // SUN BEHAVIOR:
-  // Starts centered at 25% height.
-  // As user scrolls, the Sun moves UPWARD and slightly arches left/right,
-  // scaling down slightly and disappearing smoothly above the viewport into dusk.
-  // Sun reaches 0 opacity by p = ~0.65.
-  const sunY = -p * 550; // Translates upward up to -550px
+  // Starts centered in the upper sky. As user scrolls, the Sun smoothly moves UPWARD,
+  // scaling down slightly and disappearing into the sky as twilight arrives.
+  const sunY = -p * 550;
   const sunScale = Math.max(0.65, 1 - p * 0.45);
-  const sunOpacity = Math.max(0, Math.min(1, (0.6 - p) / 0.35));
+  const sunOpacity = Math.max(0, Math.min(1, (0.62 - p) / 0.35));
   sunEl.style.transform = `translate3d(0, ${sunY}px, 0) scale(${sunScale})`;
   sunEl.style.opacity = sunOpacity.toFixed(3);
 
   // MOON BEHAVIOR:
-  // Moon starts below or off-view (p < 0.4), then glides smoothly UPWARD into the firmament.
-  // Reaches its peak position around p = 0.9 - 1.0.
+  // Moon enters smoothly from below and glides up into the night firmament.
   const moonStartProgress = 0.35;
   const moonProgress = Math.max(0, Math.min(1, (p - moonStartProgress) / (1 - moonStartProgress)));
-  // Moon translates from 400px down to 0px
   const moonY = lerp(380, 0, Math.pow(moonProgress, 0.85));
   const moonOpacity = Math.max(0, Math.min(1, (p - 0.45) / 0.35));
   moonEl.style.transform = `translate3d(0, ${moonY}px, 0) scale(${lerp(0.8, 1.0, moonProgress)})`;
   moonEl.style.opacity = moonOpacity.toFixed(3);
 
   // BIRDS BEHAVIOR:
-  // Birds soar during day, fade out completely as twilight arrives
+  // Birds soar gently in the daytime breeze, fading out at dusk
   const birdOpacity = Math.max(0, Math.min(1, (0.55 - p) / 0.3));
   birdsLayer.style.opacity = birdOpacity.toFixed(3);
 
-  // PARALLAX MOUNTAINS:
-  // Gentle vertical depth shifting on scroll
-  const scrollOffset = window.scrollY || 0;
-  layerDistant.style.transform = `translate3d(0, ${scrollOffset * 0.04}px, 0)`;
-  layerMid.style.transform = `translate3d(0, ${scrollOffset * 0.07}px, 0)`;
-  layerNear.style.transform = `translate3d(0, ${scrollOffset * 0.11}px, 0)`;
-  layerForeground.style.transform = `translate3d(0, ${scrollOffset * 0.15}px, 0)`;
+  // NOTE: Mountains remain firmly anchored at the bottom (NO downward movement on scroll).
 }
 
+let lastThemeNight = null;
+
 function updateThemeVariables(palette, p) {
-  const root = document.documentElement;
+  // Directly update SVG Mountain gradient stops (zero layout reflow)
+  if (stopDistTop) stopDistTop.setAttribute('stop-color', palette.distTop);
+  if (stopDistBot) stopDistBot.setAttribute('stop-color', palette.distBot);
+  if (stopMidTop)  stopMidTop.setAttribute('stop-color', palette.midTop);
+  if (stopMidBot)  stopMidBot.setAttribute('stop-color', palette.midBot);
+  if (stopNearTop) stopNearTop.setAttribute('stop-color', palette.nearTop);
+  if (stopNearBot) stopNearBot.setAttribute('stop-color', palette.nearBot);
+  if (stopForeTop) stopForeTop.setAttribute('stop-color', palette.foreTop);
+  if (stopForeBot) stopForeBot.setAttribute('stop-color', palette.foreBot);
 
-  // Update SVG Mountain dynamic stops
-  root.style.setProperty('--dist-top', palette.distTop);
-  root.style.setProperty('--dist-bot', palette.distBot);
-  root.style.setProperty('--mid-top', palette.midTop);
-  root.style.setProperty('--mid-bot', palette.midBot);
-  root.style.setProperty('--near-top', palette.nearTop);
-  root.style.setProperty('--near-bot', palette.nearBot);
-  root.style.setProperty('--fore-top', palette.foreTop);
-  root.style.setProperty('--fore-bot', palette.foreBot);
-
-  // Card glassmorphic theme transitions
-  if (p > 0.55) {
-    // Night Mode Theme
-    const nightT = (p - 0.55) / 0.45;
-    root.style.setProperty('--card-bg', `rgba(15, 23, 42, ${lerp(0.75, 0.88, nightT)})`);
-    root.style.setProperty('--card-border', `rgba(148, 163, 184, ${lerp(0.2, 0.35, nightT)})`);
-    root.style.setProperty('--card-shadow', '0 25px 50px -12px rgba(0, 0, 0, 0.7)');
-    root.style.setProperty('--text-main', '#f8fafc');
-    root.style.setProperty('--text-muted', '#cbd5e1');
-    root.style.setProperty('--tag-bg', 'rgba(99, 102, 241, 0.25)');
-    root.style.setProperty('--tag-text', '#a5b4fc');
-    root.style.setProperty('--accent-color', '#818cf8');
-  } else {
-    // Day Mode Theme
-    root.style.setProperty('--card-bg', 'rgba(255, 255, 255, 0.72)');
-    root.style.setProperty('--card-border', 'rgba(255, 255, 255, 0.85)');
-    root.style.setProperty('--card-shadow', '0 20px 40px -15px rgba(234, 88, 12, 0.15)');
-    root.style.setProperty('--text-main', '#0f172a');
-    root.style.setProperty('--text-muted', '#334155');
-    root.style.setProperty('--tag-bg', 'rgba(245, 158, 11, 0.18)');
-    root.style.setProperty('--tag-text', '#b45309');
-    root.style.setProperty('--accent-color', '#f59e0b');
+  // Card & HUD Theme Transitions
+  const isNight = p > 0.55;
+  if (isNight !== lastThemeNight) {
+    lastThemeNight = isNight;
+    const root = document.documentElement;
+    if (isNight) {
+      root.style.setProperty('--card-bg', 'rgba(15, 23, 42, 0.82)');
+      root.style.setProperty('--card-border', 'rgba(148, 163, 184, 0.3)');
+      root.style.setProperty('--card-shadow', '0 25px 50px -12px rgba(0, 0, 0, 0.7)');
+      root.style.setProperty('--text-main', '#f8fafc');
+      root.style.setProperty('--text-muted', '#cbd5e1');
+      root.style.setProperty('--tag-bg', 'rgba(99, 102, 241, 0.25)');
+      root.style.setProperty('--tag-text', '#a5b4fc');
+      root.style.setProperty('--accent-color', '#818cf8');
+    } else {
+      root.style.setProperty('--card-bg', 'rgba(255, 255, 255, 0.75)');
+      root.style.setProperty('--card-border', 'rgba(255, 255, 255, 0.88)');
+      root.style.setProperty('--card-shadow', '0 20px 40px -15px rgba(234, 88, 12, 0.15)');
+      root.style.setProperty('--text-main', '#0f172a');
+      root.style.setProperty('--text-muted', '#334155');
+      root.style.setProperty('--tag-bg', 'rgba(245, 158, 11, 0.18)');
+      root.style.setProperty('--tag-text', '#b45309');
+      root.style.setProperty('--accent-color', '#f59e0b');
+    }
   }
 
-  // Update HUD
+  // Update HUD elements
   const percentText = Math.round(p * 100) + '%';
   progressPercent.textContent = percentText;
   scrollMeter.style.width = percentText;
   timeText.textContent = getTimeLabel(p);
 }
 
-// Animation loop
-function tick(timestamp) {
-  animFrameTime = timestamp;
+// High-precision frame timing for silky buttery scroll interpolation
+let lastFrameTime = performance.now();
 
-  // Smooth lerp for scroll physics
-  currentProgress = lerp(currentProgress, targetProgress, 0.08);
-  if (Math.abs(currentProgress - targetProgress) < 0.0005) {
+function tick(timestamp) {
+  const dt = Math.min(32, timestamp - lastFrameTime) / 1000;
+  lastFrameTime = timestamp;
+
+  // Frame-rate independent exponential smoothing (snappy & buttery smooth)
+  const damping = 1 - Math.exp(-14 * dt);
+  currentProgress += (targetProgress - currentProgress) * damping;
+  if (Math.abs(currentProgress - targetProgress) < 0.0002) {
     currentProgress = targetProgress;
   }
 
   const palette = getInterpolatedPalette(currentProgress);
 
   renderSky(palette, currentProgress);
-  renderFireflies(currentProgress);
   updateCelestialPositions(currentProgress);
   updateThemeVariables(palette, currentProgress);
 
@@ -421,14 +367,12 @@ function tick(timestamp) {
 
 requestAnimationFrame(tick);
 
-// Interactive Quick-Shift Button (Jumps between Day and Night)
+// Interactive Quick-Shift Button (Smooth Jump between Day and Night)
 timeToggleBtn.addEventListener('click', () => {
   if (currentProgress < 0.5) {
-    // Scroll to Night
     const nightSec = document.getElementById('sec-night');
     nightSec.scrollIntoView({ behavior: 'smooth' });
   } else {
-    // Scroll to Day
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 });
@@ -437,8 +381,6 @@ timeToggleBtn.addEventListener('click', () => {
 let audioCtx = null;
 let soundPlaying = false;
 let masterGain = null;
-let dayGain = null;
-let nightGain = null;
 
 function initAudio() {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -448,15 +390,7 @@ function initAudio() {
   masterGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
   masterGain.connect(audioCtx.destination);
 
-  // Day Ambient Gain
-  dayGain = audioCtx.createGain();
-  dayGain.connect(masterGain);
-
-  // Night Ambient Gain
-  nightGain = audioCtx.createGain();
-  nightGain.connect(masterGain);
-
-  // 1. Gentle Mountain Wind Synth (Pink Noise)
+  // Soft Mountain Wind (Pink Noise)
   const bufferSize = audioCtx.sampleRate * 2;
   const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
   const output = noiseBuffer.getChannelData(0);
@@ -485,16 +419,14 @@ function initAudio() {
   windFilter.connect(masterGain);
   whiteNoise.start();
 
-  // 2. Periodic Synthetic Daytime Birds & Night Crickets Timer
+  // Periodic Daytime Bird Calls & Night Cricket Trills
   setInterval(() => {
     if (!soundPlaying || !audioCtx) return;
     const p = currentProgress;
 
     if (p < 0.4 && Math.random() < 0.4) {
-      // Play brief high-pitched day chirp
       playChirp();
     } else if (p > 0.6 && Math.random() < 0.5) {
-      // Play gentle cricket trill
       playCricket();
     }
   }, 1200);

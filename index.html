@@ -52,9 +52,6 @@
       <div class="bird bird-5"></div>
     </div>
 
-    <!-- NIGHTTIME FIREFLIES & PARTICLES -->
-    <canvas id="particles-canvas"></canvas>
-
     <!-- DRIFTING CLOUDS / VALLEY MIST -->
     <div id="clouds-layer" class="clouds-layer">
       <div class="cloud cloud-1"></div>
@@ -63,34 +60,47 @@
       <div class="cloud cloud-4"></div>
     </div>
 
-    <!-- MULTI-LAYERED SVG MOUNTAINS (BOTTOM ANCHORED) -->
+    <!-- MULTI-LAYERED MAJESTIC SVG MOUNTAINS (BOTTOM ANCHORED) -->
     <div id="mountains-container" class="mountains-container">
-      <!-- Distant Peak Ridge (Layer 4) -->
-      <svg class="mountain-layer layer-distant" viewBox="0 0 1920 600" preserveAspectRatio="none">
+      
+      <!-- Layer 4: Distant Majestic Alpine Peaks with 3D Ridge Facets -->
+      <svg class="mountain-layer layer-distant" viewBox="0 0 1920 700" preserveAspectRatio="none">
         <defs>
           <linearGradient id="grad-distant" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" class="stop-distant-top" />
             <stop offset="100%" class="stop-distant-bot" />
           </linearGradient>
+          <linearGradient id="grad-distant-shadow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#000000" stop-opacity="0.25" />
+            <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+          </linearGradient>
         </defs>
-        <path d="M0,600 L0,260 L140,190 L260,250 L420,120 L580,240 L720,150 L890,280 L1080,80 L1260,220 L1420,130 L1600,260 L1780,170 L1920,240 L1920,600 Z" fill="url(#grad-distant)"/>
+        <!-- Alpine Peak Main Silhouette -->
+        <path d="M0,700 L0,360 L60,320 L130,350 L200,260 L280,290 L360,95 L440,240 L520,300 L590,230 L690,135 L780,260 L870,320 L960,65 L1050,220 L1140,310 L1220,230 L1310,110 L1400,245 L1490,310 L1580,185 L1670,85 L1750,230 L1830,295 L1920,210 L1920,700 Z" fill="url(#grad-distant)"/>
+        <!-- 3D Shadow Ridge Facets for Matterhorn-like depth -->
+        <path d="M360,95 L440,240 L380,310 L280,290 Z M690,135 L780,260 L710,320 L590,230 Z M960,65 L1050,220 L980,330 L870,320 Z M1310,110 L1400,245 L1330,320 L1220,230 Z M1670,85 L1750,230 L1690,310 L1580,185 Z" fill="url(#grad-distant-shadow)" />
       </svg>
 
-      <!-- Mid-Distant Alpine Ridge (Layer 3) -->
-      <svg class="mountain-layer layer-mid" viewBox="0 0 1920 600" preserveAspectRatio="none">
+      <!-- Layer 3: Mid-Distant Craggy Massif & Alpine Couloirs -->
+      <svg class="mountain-layer layer-mid" viewBox="0 0 1920 650" preserveAspectRatio="none">
         <defs>
           <linearGradient id="grad-mid" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" class="stop-mid-top" />
             <stop offset="100%" class="stop-mid-bot" />
           </linearGradient>
+          <linearGradient id="grad-mid-shadow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#000000" stop-opacity="0.2" />
+            <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+          </linearGradient>
         </defs>
-        <path d="M0,600 L0,320 L190,230 L360,340 L520,200 L690,330 L870,180 L1040,310 L1220,190 L1410,340 L1580,210 L1740,310 L1920,220 L1920,600 Z" fill="url(#grad-mid)"/>
+        <path d="M0,650 L0,390 L80,335 L170,405 L280,280 L390,360 L510,210 L620,345 L740,250 L860,370 L980,230 L1100,340 L1220,195 L1340,325 L1460,220 L1580,355 L1700,250 L1810,360 L1920,285 L1920,650 Z" fill="url(#grad-mid)"/>
+        <path d="M280,280 L390,360 L320,430 L170,405 Z M510,210 L620,345 L540,410 L390,360 Z M980,230 L1100,340 L1020,420 L860,370 Z M1220,195 L1340,325 L1260,400 L1100,340 Z M1460,220 L1580,355 L1500,430 L1340,325 Z M1700,250 L1810,360 L1740,430 L1580,355 Z" fill="url(#grad-mid-shadow)"/>
       </svg>
 
       <!-- Valley Mist Layer -->
       <div class="valley-mist"></div>
 
-      <!-- Near Mountains & Ridge (Layer 2) -->
+      <!-- Layer 2: Near Foothill Ridges & Rocky Outcrops -->
       <svg class="mountain-layer layer-near" viewBox="0 0 1920 600" preserveAspectRatio="none">
         <defs>
           <linearGradient id="grad-near" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -98,19 +108,27 @@
             <stop offset="100%" class="stop-near-bot" />
           </linearGradient>
         </defs>
-        <path d="M0,600 L0,380 L130,310 L280,390 L440,270 L620,410 L780,290 L960,390 L1150,260 L1340,380 L1510,290 L1700,390 L1920,300 L1920,600 Z" fill="url(#grad-near)"/>
+        <path d="M0,600 L0,410 L90,355 L210,430 L340,310 L480,415 L620,290 L750,395 L880,310 L1010,415 L1150,285 L1290,405 L1430,305 L1570,420 L1710,325 L1840,410 L1920,345 L1920,600 Z" fill="url(#grad-near)"/>
       </svg>
 
-      <!-- Foreground Craggy Pine Ridge (Layer 1) -->
-      <svg class="mountain-layer layer-foreground" viewBox="0 0 1920 500" preserveAspectRatio="none">
+      <!-- Layer 1: Dense Pine Forest Silhouettes & Crags (Bottom Anchor) -->
+      <svg class="mountain-layer layer-foreground" viewBox="0 0 1920 450" preserveAspectRatio="none">
         <defs>
           <linearGradient id="grad-fore" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" class="stop-fore-top" />
             <stop offset="100%" class="stop-fore-bot" />
           </linearGradient>
         </defs>
-        <!-- Mountain crags with stylized spruce pines silhouettes -->
-        <path d="M0,500 L0,380 L40,390 L60,350 L80,390 L120,400 L160,360 L200,410 L280,330 L330,370 L390,320 L450,380 L520,330 L590,400 L680,310 L750,370 L830,290 L920,370 L1010,310 L1110,390 L1200,320 L1290,400 L1390,300 L1480,380 L1570,320 L1660,390 L1760,310 L1850,370 L1920,340 L1920,500 Z" fill="url(#grad-fore)"/>
+        <!-- Jagged pines pattern and rocks -->
+        <path d="M0,450 L0,320 
+          L15,310 L25,330 L35,285 L45,330 L60,305 L70,325 L85,270 L100,335 L120,315 L135,290 L150,340 
+          L175,275 L190,330 L210,310 L230,260 L250,335 L275,300 L295,330 L320,250 L345,340 L370,310 
+          L395,270 L420,340 L445,315 L475,260 L505,335 L530,310 L560,250 L590,340 L615,315 L645,265 
+          L675,340 L705,305 L735,255 L765,335 L795,310 L825,270 L855,340 L885,305 L915,245 L945,335 
+          L975,310 L1005,265 L1035,340 L1065,305 L1095,255 L1125,335 L1155,310 L1185,270 L1215,340 
+          L1245,300 L1275,250 L1305,335 L1335,310 L1365,265 L1395,340 L1425,310 L1455,255 L1485,335 
+          L1515,305 L1545,265 L1575,340 L1605,310 L1635,250 L1665,335 L1695,305 L1725,270 L1755,340 
+          L1785,300 L1815,255 L1845,335 L1875,310 L1905,280 L1920,310 L1920,450 Z" fill="url(#grad-fore)"/>
       </svg>
     </div>
 
@@ -224,7 +242,7 @@
           The sun has retreated and the velvet obsidian firmament has arrived. In its place, the pearl-white Moon rises high, casting sharp silvery luminescence along the snowy ridgelines.
         </p>
         <p>
-          Constellations sparkle through the crystal-clear alpine atmosphere. Fireflies shimmer along the timberline, and shooting stars streak silently across the cosmic canvas.
+          Constellations sparkle through the crystal-clear alpine atmosphere. Cool mountain night winds sweep across the ridges, and shooting stars streak silently across the cosmic canvas.
         </p>
         <div class="feature-pills">
           <span class="pill">🌕 Lunar Radiance</span>
