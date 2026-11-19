@@ -359,7 +359,7 @@ body {
 }
 
 /* ==========================================================================
-   REAL PROCEDURAL FRACTAL MOUNTAINS CONTAINER
+   REAL PHOTOGRAPHIC MOUNTAINS CONTAINER
    ========================================================================== */
 
 .mountains-container {
@@ -367,21 +367,73 @@ body {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 25vh;
-  min-height: 160px;
-  max-height: 240px;
+  height: 30vh;
+  min-height: 180px;
+  max-height: 260px;
   z-index: 5;
   pointer-events: none;
   overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 
-#mountains-canvas {
+.real-mountain {
   position: absolute;
   bottom: 0;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
+  min-width: 1300px;
   height: 100%;
-  display: block;
+  object-fit: cover;
+  object-position: bottom center;
+  pointer-events: none;
+  z-index: 1;
+  will-change: filter;
+  transition: filter 0.2s linear;
+}
+
+/* ANIMATED VOLUMETRIC VALLEY MIST OVER REAL MOUNTAINS */
+.alpine-mist {
+  position: absolute;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 60%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.08) 50%, transparent 75%);
+  filter: blur(18px);
+  will-change: transform;
+  border-radius: 50%;
+}
+
+.mist-layer-back {
+  z-index: 2;
+  left: -20%;
+  width: 140%;
+  height: 55px;
+  bottom: 18%;
+  opacity: 0.5;
+  animation: drift-mist-1 32s ease-in-out infinite alternate;
+}
+
+.mist-layer-front {
+  z-index: 3;
+  left: -10%;
+  width: 120%;
+  height: 45px;
+  bottom: 5%;
+  opacity: 0.35;
+  animation: drift-mist-2 42s ease-in-out infinite alternate;
+}
+
+@keyframes drift-mist-1 {
+  0% { transform: translateX(0%) scaleY(1); }
+  50% { transform: translateX(8%) scaleY(1.2); }
+  100% { transform: translateX(18%) scaleY(0.9); }
+}
+
+@keyframes drift-mist-2 {
+  0% { transform: translateX(10%) scaleY(1); }
+  50% { transform: translateX(-5%) scaleY(1.25); }
+  100% { transform: translateX(-15%) scaleY(1); }
 }
 
 .ambient-overlay {

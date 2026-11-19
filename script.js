@@ -1,7 +1,7 @@
 /**
- * CELESTIAL HORIZONS - DAY TO NIGHT SCROLL & REAL MOUNTAIN ENGINE
+ * CELESTIAL HORIZONS - DAY TO NIGHT SCROLL & REAL MOUNTAINS ENGINE
  * Pure Vanilla JavaScript & HTML5 Canvas
- * Photorealistic Procedural Fractal Alps & Smooth Touchpad Scrolling
+ * Real Photographic Alpine Ridge & Smooth Touchpad Scrolling
  */
 
 // Helper color interpolation utilities
@@ -43,37 +43,25 @@ const skyStops = {
   0.0: {
     top: '#38bdf8',
     mid: '#7dd3fc',
-    bot: '#fef08a',
-    distRock: '#7ba2d4', distSnow: '#f8fafc',
-    midRock:  '#3d6499', midShade: '#27436b',
-    foreRock: '#1b2a47', foreTree: '#0f172a'
+    bot: '#fef08a'
   },
   // 0.35: Late Golden Afternoon
   0.35: {
     top: '#0284c7',
     mid: '#f59e0b',
-    bot: '#fed7aa',
-    distRock: '#6b72a8', distSnow: '#ffedd5',
-    midRock:  '#433878', midShade: '#2d2454',
-    foreRock: '#211742', foreTree: '#110c24'
+    bot: '#fed7aa'
   },
   // 0.65: Sunset / Twilight (Vivid Crimson & Royal Violet)
   0.65: {
     top: '#311042',
     mid: '#9a1b5d',
-    bot: '#ea580c',
-    distRock: '#4a154b', distSnow: '#fed7aa',
-    midRock:  '#330c3d', midShade: '#1f0426',
-    foreRock: '#16021c', foreTree: '#0a000d'
+    bot: '#ea580c'
   },
   // 1.0: Deep Midnight Obsidian / Black
   1.0: {
     top: '#020617', // Obsidian Black
     mid: '#090d16', // Deep Midnight
-    bot: '#0f172a', // Starry Horizon
-    distRock: '#1e293b', distSnow: '#94a3b8',
-    midRock:  '#131b2e', midShade: '#0a0f1d',
-    foreRock: '#090d17', foreTree: '#020617'
+    bot: '#0f172a'  // Starry Horizon
   }
 };
 
@@ -94,13 +82,7 @@ function getInterpolatedPalette(p) {
   return {
     top: lerpColor(s1.top, s2.top, localT),
     mid: lerpColor(s1.mid, s2.mid, localT),
-    bot: lerpColor(s1.bot, s2.bot, localT),
-    distRock: lerpColor(s1.distRock, s2.distRock, localT),
-    distSnow: lerpColor(s1.distSnow, s2.distSnow, localT),
-    midRock:  lerpColor(s1.midRock, s2.midRock, localT),
-    midShade: lerpColor(s1.midShade, s2.midShade, localT),
-    foreRock: lerpColor(s1.foreRock, s2.foreRock, localT),
-    foreTree: lerpColor(s1.foreTree, s2.foreTree, localT),
+    bot: lerpColor(s1.bot, s2.bot, localT)
   };
 }
 
@@ -108,10 +90,7 @@ function getInterpolatedPalette(p) {
 const skyCanvas = document.getElementById('sky-canvas');
 const skyCtx = skyCanvas.getContext('2d', { alpha: false });
 
-const mountainsContainer = document.getElementById('mountains-container');
-const mountainsCanvas = document.getElementById('mountains-canvas');
-const mountainsCtx = mountainsCanvas.getContext('2d');
-
+const realMountainEl = document.getElementById('real-mountain');
 const sunEl = document.getElementById('sun-element');
 const moonEl = document.getElementById('moon-element');
 const birdsLayer = document.getElementById('birds-layer');
@@ -132,123 +111,12 @@ if (viewModeBtn) {
   });
 }
 
-// ==========================================================================
-// DETERMINISTIC REAL FRACTAL MOUNTAIN ELEVATION GENERATOR
-// ==========================================================================
-
-// Seeded pseudorandom table for authentic reproducible geology
-const PERM = new Float32Array(1024);
-let seed = 42;
-function pseudoRandom() {
-  seed = (seed * 9301 + 49297) % 233280;
-  return seed / 233280;
-}
-for (let i = 0; i < 1024; i++) {
-  PERM[i] = pseudoRandom();
-}
-
-function smoothHermite(t) {
-  return t * t * (3 - 2 * t);
-}
-
-function noise1D(x) {
-  const i = Math.floor(x);
-  const f = x - i;
-  const idx1 = Math.abs(i) % 1024;
-  const idx2 = (idx1 + 1) % 1024;
-  const u = smoothHermite(f);
-  return PERM[idx1] * (1 - u) + PERM[idx2] * u;
-}
-
-// Sharp alpine ridge noise (Matterhorn & Mont Blanc razor crags)
-function alpineRidgeNoise(x, octaves = 6) {
-  let val = 0;
-  let freq = 1;
-  let amp = 1;
-  let totalAmp = 0;
-  for (let o = 0; o < octaves; o++) {
-    const raw = noise1D(x * freq + o * 17.3);
-    const ridge = 1.0 - Math.abs(raw * 2 - 1);
-    val += ridge * ridge * amp;
-    totalAmp += amp;
-    freq *= 2.15;
-    amp *= 0.46;
-  }
-  return val / totalAmp;
-}
-
-// Soft rolling fractal noise for foothill strata
-function stratifiedNoise(x, octaves = 4) {
-  let val = 0;
-  let freq = 1;
-  let amp = 1;
-  let totalAmp = 0;
-  for (let o = 0; o < octaves; o++) {
-    val += noise1D(x * freq + o * 31.7) * amp;
-    totalAmp += amp;
-    freq *= 2.0;
-    amp *= 0.5;
-  }
-  return val / totalAmp;
-}
-
-// Elevation height caches for 60FPS rendering
-let cachedWidth = 0;
-let distHeights = null;
-let midHeights = null;
-let foreHeights = null;
-
-function computeTerrainProfiles(w, h) {
-  cachedWidth = w;
-  distHeights = new Float32Array(w);
-  midHeights  = new Float32Array(w);
-  foreHeights = new Float32Array(w);
-
-  // Distant Alps (Towering summits with natural saddles and cirques)
-  for (let x = 0; x < w; x++) {
-    const nx = (x / w) * 5.2;
-    // Primary alpine ridge + harmonic sub-peaks
-    const r1 = alpineRidgeNoise(nx, 6);
-    const r2 = noise1D(nx * 0.8) * 0.35;
-    // Height: 50% to 92% of mountain canvas height
-    distHeights[x] = h * (0.42 + (r1 * 0.46 + r2 * 0.12));
-  }
-
-  // Mid-Range Massif (Stratified granite crags)
-  for (let x = 0; x < w; x++) {
-    const nx = (x / w) * 7.5 + 4.2;
-    const m1 = alpineRidgeNoise(nx, 5);
-    const m2 = stratifiedNoise(nx * 1.5, 4);
-    // Height: 30% to 68% of mountain canvas height
-    midHeights[x] = h * (0.28 + (m1 * 0.32 + m2 * 0.1));
-  }
-
-  // Foreground Alpine Foothills & Pine Ridge
-  for (let x = 0; x < w; x++) {
-    const nx = (x / w) * 9.8 + 8.7;
-    const f1 = stratifiedNoise(nx, 4);
-    // Add natural pine tree spires along the crest
-    const treeNoise = Math.sin(x * 0.45) > 0.65 ? (noise1D(x * 1.2) * 12) : 0;
-    // Height: 12% to 42% of mountain canvas height
-    foreHeights[x] = h * (0.12 + f1 * 0.22) + treeNoise;
-  }
-}
-
 // Window sizing
 function handleResize() {
   const w = window.innerWidth;
   const h = window.innerHeight;
-
   skyCanvas.width = w;
   skyCanvas.height = h;
-
-  const mRect = mountainsContainer.getBoundingClientRect();
-  const mw = Math.round(mRect.width || w);
-  const mh = Math.round(mRect.height || h * 0.25);
-  mountainsCanvas.width = mw;
-  mountainsCanvas.height = mh;
-
-  computeTerrainProfiles(mw, mh);
   initStars();
 }
 window.addEventListener('resize', handleResize);
@@ -380,130 +248,30 @@ function renderSky(palette, p) {
 }
 
 // ==========================================================================
-// PHOTOREALISTIC MOUNTAIN RENDERER
+// REAL PHOTOGRAPHIC MOUNTAINS LIGHTING ENGINE
 // ==========================================================================
 
-function renderPhotorealisticMountains(palette, p) {
-  const w = mountainsCanvas.width;
-  const h = mountainsCanvas.height;
-  if (!distHeights || distHeights.length !== w) {
-    computeTerrainProfiles(w, h);
+function updateRealMountainLighting(p) {
+  if (!realMountainEl) return;
+  if (p < 0.5) {
+    // Summer Daytime -> Warm Golden Hour
+    const t = p / 0.5;
+    const bright = lerp(1.05, 0.82, t);
+    const contrast = lerp(1.02, 1.15, t);
+    const sat = lerp(1.1, 1.35, t);
+    const hue = lerp(0, -18, t);
+    const glow = (1 - t) * 20;
+    realMountainEl.style.filter = `brightness(${bright.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${sat.toFixed(2)}) hue-rotate(${hue.toFixed(1)}deg) drop-shadow(0 0 ${glow}px rgba(254, 240, 138, 0.3))`;
+  } else {
+    // Twilight Sunset -> Cool Silvery Midnight
+    const nightT = (p - 0.5) / 0.5;
+    const bright = lerp(0.82, 0.38, nightT);
+    const contrast = lerp(1.15, 1.25, nightT);
+    const sat = lerp(1.35, 0.55, nightT);
+    const hue = lerp(-18, 185, nightT);
+    const moonGlow = nightT * 25;
+    realMountainEl.style.filter = `brightness(${bright.toFixed(2)}) contrast(${contrast.toFixed(2)}) saturate(${sat.toFixed(2)}) hue-rotate(${hue.toFixed(1)}deg) drop-shadow(0 0 ${moonGlow}px rgba(186, 230, 253, 0.4))`;
   }
-
-  mountainsCtx.clearRect(0, 0, w, h);
-
-  // 1. LAYER 1: DISTANT HIGH ALPS (With Snowcaps & Slope Lighting)
-  const distBaseY = h;
-  mountainsCtx.save();
-
-  // Draw rock silhouette
-  mountainsCtx.beginPath();
-  mountainsCtx.moveTo(0, distBaseY);
-  for (let x = 0; x < w; x++) {
-    mountainsCtx.lineTo(x, distBaseY - distHeights[x]);
-  }
-  mountainsCtx.lineTo(w, distBaseY);
-  mountainsCtx.closePath();
-
-  const distGrad = mountainsCtx.createLinearGradient(0, distBaseY - h, 0, distBaseY);
-  distGrad.addColorStop(0, palette.distRock);
-  distGrad.addColorStop(0.65, palette.distRock);
-  distGrad.addColorStop(1, palette.bot);
-  mountainsCtx.fillStyle = distGrad;
-  mountainsCtx.fill();
-
-  // Natural snow caps and slope highlights on peaks higher than 55% elevation
-  const snowThreshold = h * 0.58;
-  mountainsCtx.beginPath();
-  let inSnow = false;
-  for (let x = 0; x < w; x++) {
-    const elev = distHeights[x];
-    if (elev > snowThreshold) {
-      const topY = distBaseY - elev;
-      if (!inSnow) {
-        mountainsCtx.moveTo(x, topY);
-        inSnow = true;
-      } else {
-        mountainsCtx.lineTo(x, topY);
-      }
-    } else if (inSnow) {
-      mountainsCtx.lineTo(x, distBaseY - snowThreshold);
-      inSnow = false;
-    }
-  }
-  mountainsCtx.fillStyle = palette.distSnow;
-  mountainsCtx.globalAlpha = 0.85;
-  mountainsCtx.fill();
-  mountainsCtx.globalAlpha = 1.0;
-
-  // Slope Shading: East vs West face illumination
-  mountainsCtx.beginPath();
-  for (let x = 1; x < w - 1; x += 2) {
-    const slope = distHeights[x + 1] - distHeights[x - 1];
-    if (slope < -0.3) {
-      // West-facing rock shadow
-      const y = distBaseY - distHeights[x];
-      mountainsCtx.rect(x, y, 2, distHeights[x]);
-    }
-  }
-  mountainsCtx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-  mountainsCtx.fill();
-
-  // Atmospheric haze layer over distant peaks
-  const hazeGrad = mountainsCtx.createLinearGradient(0, distBaseY - h * 0.5, 0, distBaseY);
-  hazeGrad.addColorStop(0, 'transparent');
-  hazeGrad.addColorStop(1, palette.bot);
-  mountainsCtx.fillStyle = hazeGrad;
-  mountainsCtx.globalAlpha = 0.35;
-  mountainsCtx.fillRect(0, 0, w, h);
-  mountainsCtx.globalAlpha = 1.0;
-  mountainsCtx.restore();
-
-  // 2. LAYER 2: MID-RANGE GRANITE MASSIF
-  mountainsCtx.save();
-  mountainsCtx.beginPath();
-  mountainsCtx.moveTo(0, distBaseY);
-  for (let x = 0; x < w; x++) {
-    mountainsCtx.lineTo(x, distBaseY - midHeights[x]);
-  }
-  mountainsCtx.lineTo(w, distBaseY);
-  mountainsCtx.closePath();
-
-  const midGrad = mountainsCtx.createLinearGradient(0, distBaseY - h * 0.7, 0, distBaseY);
-  midGrad.addColorStop(0, palette.midRock);
-  midGrad.addColorStop(1, palette.midShade);
-  mountainsCtx.fillStyle = midGrad;
-  mountainsCtx.fill();
-
-  // Mid-range rock facet shadow
-  mountainsCtx.beginPath();
-  for (let x = 1; x < w - 1; x += 2) {
-    const slope = midHeights[x + 1] - midHeights[x - 1];
-    if (slope < -0.4) {
-      const y = distBaseY - midHeights[x];
-      mountainsCtx.rect(x, y, 2, midHeights[x]);
-    }
-  }
-  mountainsCtx.fillStyle = 'rgba(0, 0, 0, 0.22)';
-  mountainsCtx.fill();
-  mountainsCtx.restore();
-
-  // 3. LAYER 3: FOREGROUND FOOTHILLS & EVERGREEN PINES
-  mountainsCtx.save();
-  mountainsCtx.beginPath();
-  mountainsCtx.moveTo(0, distBaseY);
-  for (let x = 0; x < w; x++) {
-    mountainsCtx.lineTo(x, distBaseY - foreHeights[x]);
-  }
-  mountainsCtx.lineTo(w, distBaseY);
-  mountainsCtx.closePath();
-
-  const foreGrad = mountainsCtx.createLinearGradient(0, distBaseY - h * 0.45, 0, distBaseY);
-  foreGrad.addColorStop(0, palette.foreRock);
-  foreGrad.addColorStop(1, palette.foreTree);
-  mountainsCtx.fillStyle = foreGrad;
-  mountainsCtx.fill();
-  mountainsCtx.restore();
 }
 
 function updateCelestialPositions(p) {
@@ -582,7 +350,7 @@ function tick(timestamp) {
   const palette = getInterpolatedPalette(currentProgress);
 
   renderSky(palette, currentProgress);
-  renderPhotorealisticMountains(palette, currentProgress);
+  updateRealMountainLighting(currentProgress);
   updateCelestialPositions(currentProgress);
   updateThemeVariables(palette, currentProgress);
 
