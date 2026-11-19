@@ -121,12 +121,12 @@ body {
 
 /* --- THE SUN --- */
 .sun {
-  width: 180px;
-  height: 180px;
-  left: 50%;
-  top: 25%;
-  margin-left: -90px;
-  margin-top: -90px;
+  width: 170px;
+  height: 170px;
+  left: 65%;
+  top: 24%;
+  margin-left: -85px;
+  margin-top: -85px;
 }
 
 .sun-core {
@@ -192,12 +192,12 @@ body {
 
 /* --- THE MOON --- */
 .moon {
-  width: 150px;
-  height: 150px;
-  left: 50%;
-  top: 25%;
-  margin-left: -75px;
-  margin-top: -75px;
+  width: 140px;
+  height: 140px;
+  left: 65%;
+  top: 24%;
+  margin-left: -70px;
+  margin-top: -70px;
   opacity: 0;
   transform: translate3d(0, 300px, 0);
 }
@@ -359,7 +359,7 @@ body {
 }
 
 /* ==========================================================================
-   MULTI-LAYERED DETAILED & ANIMATED MOUNTAINS (SLEEK BOTTOM HORIZON)
+   REAL PROCEDURAL FRACTAL MOUNTAINS CONTAINER
    ========================================================================== */
 
 .mountains-container {
@@ -367,7 +367,7 @@ body {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 26vh;
+  height: 25vh;
   min-height: 160px;
   max-height: 240px;
   z-index: 5;
@@ -375,76 +375,13 @@ body {
   overflow: hidden;
 }
 
-.mountain-layer {
+#mountains-canvas {
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  transform: none !important;
-  transform-origin: bottom center;
-}
-
-.layer-distant { z-index: 1; height: 100%; }
-.layer-mid     { z-index: 3; height: 85%; }
-.layer-near    { z-index: 5; height: 72%; }
-
-.snow-caps {
-  animation: shimmer-snow 8s ease-in-out infinite alternate;
-  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.7));
-}
-
-@keyframes shimmer-snow {
-  0% { opacity: 0.75; }
-  100% { opacity: 1; }
-}
-
-/* ANIMATED VOLUMETRIC VALLEY MIST */
-.alpine-mist {
-  position: absolute;
-  pointer-events: none;
-  background: radial-gradient(ellipse at 50% 60%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.08) 50%, transparent 75%);
-  filter: blur(16px);
-  will-change: transform;
-  border-radius: 50%;
-}
-
-.mist-layer-back {
-  z-index: 2;
-  left: -20%;
-  width: 140%;
-  height: 55px;
-  bottom: 25%;
-  opacity: 0.55;
-  animation: drift-mist-1 32s ease-in-out infinite alternate;
-}
-
-.mist-layer-front {
-  z-index: 4;
-  left: -10%;
-  width: 120%;
-  height: 45px;
-  bottom: 12%;
-  opacity: 0.4;
-  animation: drift-mist-2 42s ease-in-out infinite alternate;
-}
-
-@keyframes drift-mist-1 {
-  0% { transform: translateX(0%) scaleY(1); }
-  50% { transform: translateX(8%) scaleY(1.2); }
-  100% { transform: translateX(18%) scaleY(0.9); }
-}
-
-@keyframes drift-mist-2 {
-  0% { transform: translateX(10%) scaleY(1); }
-  50% { transform: translateX(-5%) scaleY(1.25); }
-  100% { transform: translateX(-15%) scaleY(1); }
-}
-
-.stop-distant-top, .stop-distant-bot,
-.stop-mid-top, .stop-mid-bot,
-.stop-near-top, .stop-near-bot,
-.stop-fore-top, .stop-fore-bot {
-  transition: stop-color 0.25s linear;
+  height: 100%;
+  display: block;
 }
 
 .ambient-overlay {
@@ -591,43 +528,56 @@ body {
 }
 
 /* ==========================================================================
-   SCROLLABLE STORY CONTENT
+   SCROLLABLE STORY CONTENT (DOCKED ON LEFT FOR UNOBSTRUCTED CELESTIAL VIEW)
    ========================================================================== */
 
 .content-wrapper {
   position: relative;
   z-index: 10;
-  padding-top: 15vh;
+  padding-top: 14vh;
   padding-bottom: 25vh;
+  padding-left: 6vw;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 40vh; /* Generous breathing room so celestial movements unfold smoothly */
+  align-items: flex-start; /* Completely off-center to the left! */
+  gap: 45vh;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+/* Cinematic Clean View mode */
+body.clean-view .content-wrapper {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-40px);
 }
 
 .story-section {
-  width: min(92%, 760px);
-  min-height: 50vh;
+  width: min(88vw, 420px); /* Compact readable width */
+  min-height: 40vh;
   display: flex;
   align-items: center;
-  justify-content: center;
-  scroll-snap-align: center;
+  justify-content: flex-start;
 }
 
 .story-card {
   width: 100%;
-  padding: 48px;
-  border-radius: 32px;
+  padding: 34px 28px;
+  border-radius: 24px;
+  pointer-events: auto;
   background: var(--card-bg);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--card-border);
   box-shadow: var(--card-shadow);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  transition: transform 0.3s ease, background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 .story-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
 }
 
 .section-tag {

@@ -60,111 +60,9 @@
       <div class="cloud cloud-4"></div>
     </div>
 
-    <!-- MULTI-LAYERED DETAILED & ANIMATED ALPINE MOUNTAINS (SLEEK BOTTOM HORIZON) -->
+    <!-- REAL PROCEDURAL FRACTAL ALPINE MOUNTAINS (CANVAS-RENDERED) -->
     <div id="mountains-container" class="mountains-container">
-      
-      <!-- Layer 3: Distant Grand Alpine Range with Snow-Dusted Peaks -->
-      <svg class="mountain-layer layer-distant" viewBox="0 0 1920 400" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="grad-distant" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" class="stop-distant-top" />
-            <stop offset="100%" class="stop-distant-bot" />
-          </linearGradient>
-          <!-- Snowcap Gradient: Soft morning/afternoon snow with subtle glow -->
-          <linearGradient id="grad-snow" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85" />
-            <stop offset="60%" stop-color="#e2e8f0" stop-opacity="0.5" />
-            <stop offset="100%" stop-color="#94a3b8" stop-opacity="0" />
-          </linearGradient>
-          <!-- Subtle Shadow Shading on East-Facing Ridges -->
-          <linearGradient id="grad-ridge-shadow" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#000000" stop-opacity="0.28" />
-            <stop offset="100%" stop-color="#000000" stop-opacity="0" />
-          </linearGradient>
-        </defs>
-        <!-- High Alpine Rock Silhouette with natural fractal crags -->
-        <path d="M0,400 L0,210 
-          L45,195 L95,205 L155,160 L210,175 L285,115 L335,145 L390,75 L450,135 L515,165 L570,125 
-          L645,65 L715,130 L785,170 L840,110 L910,45 L975,115 L1040,155 L1105,100 L1180,55 
-          L1245,120 L1315,155 L1375,95 L1450,50 L1520,125 L1595,165 L1665,95 L1740,60 L1810,130 
-          L1875,170 L1920,140 L1920,400 Z" fill="url(#grad-distant)"/>
-        
-        <!-- Snow Caps on High Summits -->
-        <path class="snow-caps" d="
-          M390,75 L365,110 L415,105 Z 
-          M645,65 L615,100 L675,95 Z 
-          M910,45 L875,85 L945,80 Z 
-          M1180,55 L1145,95 L1215,90 Z 
-          M1450,50 L1415,90 L1485,85 Z 
-          M1740,60 L1705,100 L1775,95 Z" fill="url(#grad-snow)"/>
-          
-        <!-- 3D Rock Strata & Ridge Facets -->
-        <path d="
-          M390,75 L450,135 L420,180 L335,145 Z 
-          M645,65 L715,130 L680,180 L570,125 Z 
-          M910,45 L975,115 L935,170 L840,110 Z 
-          M1180,55 L1245,120 L1210,175 L1105,100 Z 
-          M1450,50 L1520,125 L1480,180 L1375,95 Z 
-          M1740,60 L1810,130 L1770,185 L1665,95 Z" fill="url(#grad-ridge-shadow)"/>
-      </svg>
-
-      <!-- Animated Volumetric Mist Wave 1 -->
-      <div class="alpine-mist mist-layer-back"></div>
-
-      <!-- Layer 2: Mid-Range Jagged Granite Massif -->
-      <svg class="mountain-layer layer-mid" viewBox="0 0 1920 350" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="grad-mid" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" class="stop-mid-top" />
-            <stop offset="100%" class="stop-mid-bot" />
-          </linearGradient>
-          <linearGradient id="grad-mid-shade" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#000000" stop-opacity="0.22" />
-            <stop offset="100%" stop-color="#000000" stop-opacity="0" />
-          </linearGradient>
-        </defs>
-        <path d="M0,350 L0,220 
-          L65,190 L140,230 L220,165 L300,210 L395,130 L480,205 L570,145 L665,215 L755,140 
-          L850,220 L945,135 L1035,210 L1130,125 L1225,200 L1320,135 L1415,215 L1510,140 
-          L1605,210 L1695,150 L1790,220 L1870,175 L1920,200 L1920,350 Z" fill="url(#grad-mid)"/>
-        <path d="
-          M395,130 L480,205 L430,250 L300,210 Z 
-          M755,140 L850,220 L795,260 L665,215 Z 
-          M1130,125 L1225,200 L1175,255 L1035,210 Z 
-          M1510,140 L1605,210 L1550,260 L1415,215 Z" fill="url(#grad-mid-shade)"/>
-      </svg>
-
-      <!-- Animated Volumetric Mist Wave 2 -->
-      <div class="alpine-mist mist-layer-front"></div>
-
-      <!-- Layer 1: Near Pine Ridge & Rocky Foothills (Horizon Base) -->
-      <svg class="mountain-layer layer-near" viewBox="0 0 1920 300" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="grad-near" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" class="stop-near-top" />
-            <stop offset="100%" class="stop-near-bot" />
-          </linearGradient>
-          <linearGradient id="grad-fore" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" class="stop-fore-top" />
-            <stop offset="100%" class="stop-fore-bot" />
-          </linearGradient>
-        </defs>
-        <!-- Rocky ridge base -->
-        <path d="M0,300 L0,200 
-          L80,165 L170,210 L275,145 L380,205 L490,135 L600,195 L710,140 L825,200 L940,130 
-          L1050,195 L1160,135 L1270,195 L1380,140 L1490,205 L1600,145 L1710,200 L1820,155 L1920,190 L1920,300 Z" fill="url(#grad-near)"/>
-        <!-- Fine pine trees silhouettes on top of the foothills -->
-        <path d="M0,300 L0,220 
-          L20,205 L30,225 L45,190 L60,225 L80,200 L95,225 L115,185 L130,225 L155,205 
-          L175,175 L195,220 L220,195 L245,170 L270,225 L295,195 L320,165 L345,220 L370,195 
-          L395,170 L420,225 L450,195 L480,160 L510,220 L540,190 L570,165 L600,225 L630,195 
-          L660,160 L690,220 L720,190 L750,165 L780,225 L810,195 L840,160 L870,220 L900,185 
-          L930,155 L960,220 L990,185 L1020,160 L1050,220 L1080,185 L1110,155 L1140,220 L1170,185 
-          L1200,160 L1230,225 L1260,190 L1290,160 L1320,220 L1350,185 L1380,160 L1410,225 L1440,190 
-          L1470,160 L1500,220 L1530,185 L1560,160 L1590,225 L1620,190 L1650,160 L1680,220 L1710,185 
-          L1740,160 L1770,225 L1800,190 L1830,165 L1860,220 L1890,185 L1920,210 L1920,300 Z" fill="url(#grad-fore)"/>
-      </svg>
-
+      <canvas id="mountains-canvas"></canvas>
     </div>
 
     <!-- AMBIENT LIGHTING OVERLAY -->
@@ -190,6 +88,10 @@
     </div>
 
     <div class="hud-actions">
+      <button id="view-mode-btn" class="hud-btn" title="Toggle Clean View / Hide Text">
+        <span class="btn-icon">👁️</span>
+        <span class="btn-label">View</span>
+      </button>
       <button id="sound-btn" class="hud-btn" title="Toggle Ambient Soundscape">
         <span class="btn-icon">🔊</span>
         <span class="btn-label">Ambiance</span>

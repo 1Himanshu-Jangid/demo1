@@ -1,7 +1,7 @@
 /**
- * CELESTIAL HORIZONS - DAY TO NIGHT SCROLL ENGINE
+ * CELESTIAL HORIZONS - DAY TO NIGHT SCROLL & REAL MOUNTAIN ENGINE
  * Pure Vanilla JavaScript & HTML5 Canvas
- * Optimized for 60/120+ FPS Silky-Smooth Scrolling
+ * Photorealistic Procedural Fractal Alps & Smooth Touchpad Scrolling
  */
 
 // Helper color interpolation utilities
@@ -44,40 +44,36 @@ const skyStops = {
     top: '#38bdf8',
     mid: '#7dd3fc',
     bot: '#fef08a',
-    distTop: '#93c5fd', distBot: '#bfdbfe',
-    midTop: '#3b82f6', midBot: '#60a5fa',
-    nearTop: '#1d4ed8', nearBot: '#2563eb',
-    foreTop: '#1e3a8a', foreBot: '#0f172a'
+    distRock: '#7ba2d4', distSnow: '#f8fafc',
+    midRock:  '#3d6499', midShade: '#27436b',
+    foreRock: '#1b2a47', foreTree: '#0f172a'
   },
   // 0.35: Late Golden Afternoon
   0.35: {
     top: '#0284c7',
     mid: '#f59e0b',
     bot: '#fed7aa',
-    distTop: '#818cf8', distBot: '#a5b4fc',
-    midTop: '#4f46e5', midBot: '#6366f1',
-    nearTop: '#312e81', nearBot: '#3730a3',
-    foreTop: '#1e1b4b', foreBot: '#0f172a'
+    distRock: '#6b72a8', distSnow: '#ffedd5',
+    midRock:  '#433878', midShade: '#2d2454',
+    foreRock: '#211742', foreTree: '#110c24'
   },
   // 0.65: Sunset / Twilight (Vivid Crimson & Royal Violet)
   0.65: {
     top: '#311042',
     mid: '#9a1b5d',
     bot: '#ea580c',
-    distTop: '#581c87', distBot: '#7e22ce',
-    midTop: '#3b0764', midBot: '#6b21a8',
-    nearTop: '#240443', nearBot: '#4c1d95',
-    foreTop: '#110224', foreBot: '#05010a'
+    distRock: '#4a154b', distSnow: '#fed7aa',
+    midRock:  '#330c3d', midShade: '#1f0426',
+    foreRock: '#16021c', foreTree: '#0a000d'
   },
   // 1.0: Deep Midnight Obsidian / Black
   1.0: {
     top: '#020617', // Obsidian Black
     mid: '#090d16', // Deep Midnight
     bot: '#0f172a', // Starry Horizon
-    distTop: '#1e293b', distBot: '#0f172a',
-    midTop: '#131b2e', midBot: '#0a0f1d',
-    nearTop: '#0b1120', nearBot: '#060a12',
-    foreTop: '#030712', foreBot: '#000000'
+    distRock: '#1e293b', distSnow: '#94a3b8',
+    midRock:  '#131b2e', midShade: '#0a0f1d',
+    foreRock: '#090d17', foreTree: '#020617'
   }
 };
 
@@ -99,20 +95,22 @@ function getInterpolatedPalette(p) {
     top: lerpColor(s1.top, s2.top, localT),
     mid: lerpColor(s1.mid, s2.mid, localT),
     bot: lerpColor(s1.bot, s2.bot, localT),
-    distTop: lerpColor(s1.distTop, s2.distTop, localT),
-    distBot: lerpColor(s1.distBot, s2.distBot, localT),
-    midTop: lerpColor(s1.midTop, s2.midTop, localT),
-    midBot: lerpColor(s1.midBot, s2.midBot, localT),
-    nearTop: lerpColor(s1.nearTop, s2.nearTop, localT),
-    nearBot: lerpColor(s1.nearBot, s2.nearBot, localT),
-    foreTop: lerpColor(s1.foreTop, s2.foreTop, localT),
-    foreBot: lerpColor(s1.foreBot, s2.foreBot, localT),
+    distRock: lerpColor(s1.distRock, s2.distRock, localT),
+    distSnow: lerpColor(s1.distSnow, s2.distSnow, localT),
+    midRock:  lerpColor(s1.midRock, s2.midRock, localT),
+    midShade: lerpColor(s1.midShade, s2.midShade, localT),
+    foreRock: lerpColor(s1.foreRock, s2.foreRock, localT),
+    foreTree: lerpColor(s1.foreTree, s2.foreTree, localT),
   };
 }
 
 // DOM Elements
 const skyCanvas = document.getElementById('sky-canvas');
 const skyCtx = skyCanvas.getContext('2d', { alpha: false });
+
+const mountainsContainer = document.getElementById('mountains-container');
+const mountainsCanvas = document.getElementById('mountains-canvas');
+const mountainsCtx = mountainsCanvas.getContext('2d');
 
 const sunEl = document.getElementById('sun-element');
 const moonEl = document.getElementById('moon-element');
@@ -123,18 +121,139 @@ const timeBadge = document.getElementById('time-badge');
 const timeText = document.getElementById('time-text');
 const soundBtn = document.getElementById('sound-btn');
 const timeToggleBtn = document.getElementById('time-toggle-btn');
+const viewModeBtn = document.getElementById('view-mode-btn');
 
-// Direct SVG Stop Element references for zero-layout-shift instant recoloring
-const stopDistTop = document.querySelector('.stop-distant-top');
-const stopDistBot = document.querySelector('.stop-distant-bot');
-const stopMidTop  = document.querySelector('.stop-mid-top');
-const stopMidBot  = document.querySelector('.stop-mid-bot');
-const stopNearTop = document.querySelector('.stop-near-top');
-const stopNearBot = document.querySelector('.stop-near-bot');
-const stopForeTop = document.querySelector('.stop-fore-top');
-const stopForeBot = document.querySelector('.stop-fore-bot');
+// View mode toggle (Clean View / Hide Text)
+if (viewModeBtn) {
+  viewModeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('clean-view');
+    const isClean = document.body.classList.contains('clean-view');
+    viewModeBtn.querySelector('.btn-label').textContent = isClean ? 'Show' : 'View';
+  });
+}
 
-// Dynamic Starfield Generation (No green dots - pure crisp white/cyan cosmic stars)
+// ==========================================================================
+// DETERMINISTIC REAL FRACTAL MOUNTAIN ELEVATION GENERATOR
+// ==========================================================================
+
+// Seeded pseudorandom table for authentic reproducible geology
+const PERM = new Float32Array(1024);
+let seed = 42;
+function pseudoRandom() {
+  seed = (seed * 9301 + 49297) % 233280;
+  return seed / 233280;
+}
+for (let i = 0; i < 1024; i++) {
+  PERM[i] = pseudoRandom();
+}
+
+function smoothHermite(t) {
+  return t * t * (3 - 2 * t);
+}
+
+function noise1D(x) {
+  const i = Math.floor(x);
+  const f = x - i;
+  const idx1 = Math.abs(i) % 1024;
+  const idx2 = (idx1 + 1) % 1024;
+  const u = smoothHermite(f);
+  return PERM[idx1] * (1 - u) + PERM[idx2] * u;
+}
+
+// Sharp alpine ridge noise (Matterhorn & Mont Blanc razor crags)
+function alpineRidgeNoise(x, octaves = 6) {
+  let val = 0;
+  let freq = 1;
+  let amp = 1;
+  let totalAmp = 0;
+  for (let o = 0; o < octaves; o++) {
+    const raw = noise1D(x * freq + o * 17.3);
+    const ridge = 1.0 - Math.abs(raw * 2 - 1);
+    val += ridge * ridge * amp;
+    totalAmp += amp;
+    freq *= 2.15;
+    amp *= 0.46;
+  }
+  return val / totalAmp;
+}
+
+// Soft rolling fractal noise for foothill strata
+function stratifiedNoise(x, octaves = 4) {
+  let val = 0;
+  let freq = 1;
+  let amp = 1;
+  let totalAmp = 0;
+  for (let o = 0; o < octaves; o++) {
+    val += noise1D(x * freq + o * 31.7) * amp;
+    totalAmp += amp;
+    freq *= 2.0;
+    amp *= 0.5;
+  }
+  return val / totalAmp;
+}
+
+// Elevation height caches for 60FPS rendering
+let cachedWidth = 0;
+let distHeights = null;
+let midHeights = null;
+let foreHeights = null;
+
+function computeTerrainProfiles(w, h) {
+  cachedWidth = w;
+  distHeights = new Float32Array(w);
+  midHeights  = new Float32Array(w);
+  foreHeights = new Float32Array(w);
+
+  // Distant Alps (Towering summits with natural saddles and cirques)
+  for (let x = 0; x < w; x++) {
+    const nx = (x / w) * 5.2;
+    // Primary alpine ridge + harmonic sub-peaks
+    const r1 = alpineRidgeNoise(nx, 6);
+    const r2 = noise1D(nx * 0.8) * 0.35;
+    // Height: 50% to 92% of mountain canvas height
+    distHeights[x] = h * (0.42 + (r1 * 0.46 + r2 * 0.12));
+  }
+
+  // Mid-Range Massif (Stratified granite crags)
+  for (let x = 0; x < w; x++) {
+    const nx = (x / w) * 7.5 + 4.2;
+    const m1 = alpineRidgeNoise(nx, 5);
+    const m2 = stratifiedNoise(nx * 1.5, 4);
+    // Height: 30% to 68% of mountain canvas height
+    midHeights[x] = h * (0.28 + (m1 * 0.32 + m2 * 0.1));
+  }
+
+  // Foreground Alpine Foothills & Pine Ridge
+  for (let x = 0; x < w; x++) {
+    const nx = (x / w) * 9.8 + 8.7;
+    const f1 = stratifiedNoise(nx, 4);
+    // Add natural pine tree spires along the crest
+    const treeNoise = Math.sin(x * 0.45) > 0.65 ? (noise1D(x * 1.2) * 12) : 0;
+    // Height: 12% to 42% of mountain canvas height
+    foreHeights[x] = h * (0.12 + f1 * 0.22) + treeNoise;
+  }
+}
+
+// Window sizing
+function handleResize() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+
+  skyCanvas.width = w;
+  skyCanvas.height = h;
+
+  const mRect = mountainsContainer.getBoundingClientRect();
+  const mw = Math.round(mRect.width || w);
+  const mh = Math.round(mRect.height || h * 0.25);
+  mountainsCanvas.width = mw;
+  mountainsCanvas.height = mh;
+
+  computeTerrainProfiles(mw, mh);
+  initStars();
+}
+window.addEventListener('resize', handleResize);
+
+// Dynamic Starfield Generation
 const STARS_COUNT = 320;
 const stars = [];
 
@@ -145,7 +264,7 @@ function initStars() {
   for (let i = 0; i < STARS_COUNT; i++) {
     stars.push({
       x: Math.random() * w,
-      y: Math.random() * (h * 0.72), // Upper 72% of sky
+      y: Math.random() * (h * 0.72),
       size: Math.random() * 1.8 + 0.6,
       baseAlpha: Math.random() * 0.7 + 0.3,
       twinkleSpeed: Math.random() * 0.04 + 0.015,
@@ -170,15 +289,6 @@ function spawnMeteor() {
     });
   }
 }
-
-// Window sizing
-function handleResize() {
-  skyCanvas.width = window.innerWidth;
-  skyCanvas.height = window.innerHeight;
-  initStars();
-}
-window.addEventListener('resize', handleResize);
-handleResize();
 
 // Smooth Scroll State Tracking
 let targetProgress = 0;
@@ -208,7 +318,7 @@ function renderSky(palette, p) {
   const w = skyCanvas.width;
   const h = skyCanvas.height;
 
-  // 1. Draw Sky Gradient
+  // 1. Sky Gradient
   const grad = skyCtx.createLinearGradient(0, 0, 0, h);
   grad.addColorStop(0, palette.top);
   grad.addColorStop(0.52, palette.mid);
@@ -219,7 +329,7 @@ function renderSky(palette, p) {
   // 2. Daytime Sun Ambient Bloom
   if (p < 0.65) {
     const sunGlowAlpha = (1 - p / 0.65) * 0.45;
-    const sunBloom = skyCtx.createRadialGradient(w * 0.5, h * 0.25, 20, w * 0.5, h * 0.25, h * 0.85);
+    const sunBloom = skyCtx.createRadialGradient(w * 0.65, h * 0.24, 20, w * 0.65, h * 0.24, h * 0.85);
     sunBloom.addColorStop(0, `rgba(254, 240, 138, ${sunGlowAlpha})`);
     sunBloom.addColorStop(0.5, `rgba(251, 146, 60, ${sunGlowAlpha * 0.4})`);
     sunBloom.addColorStop(1, 'transparent');
@@ -227,7 +337,7 @@ function renderSky(palette, p) {
     skyCtx.fillRect(0, 0, w, h);
   }
 
-  // 3. Stars Rendering (Fades in smoothly as progress exceeds 0.4)
+  // 3. Stars Rendering
   const starAlpha = Math.max(0, Math.min(1, (p - 0.4) / 0.45));
   if (starAlpha > 0) {
     skyCtx.save();
@@ -269,9 +379,136 @@ function renderSky(palette, p) {
   }
 }
 
+// ==========================================================================
+// PHOTOREALISTIC MOUNTAIN RENDERER
+// ==========================================================================
+
+function renderPhotorealisticMountains(palette, p) {
+  const w = mountainsCanvas.width;
+  const h = mountainsCanvas.height;
+  if (!distHeights || distHeights.length !== w) {
+    computeTerrainProfiles(w, h);
+  }
+
+  mountainsCtx.clearRect(0, 0, w, h);
+
+  // 1. LAYER 1: DISTANT HIGH ALPS (With Snowcaps & Slope Lighting)
+  const distBaseY = h;
+  mountainsCtx.save();
+
+  // Draw rock silhouette
+  mountainsCtx.beginPath();
+  mountainsCtx.moveTo(0, distBaseY);
+  for (let x = 0; x < w; x++) {
+    mountainsCtx.lineTo(x, distBaseY - distHeights[x]);
+  }
+  mountainsCtx.lineTo(w, distBaseY);
+  mountainsCtx.closePath();
+
+  const distGrad = mountainsCtx.createLinearGradient(0, distBaseY - h, 0, distBaseY);
+  distGrad.addColorStop(0, palette.distRock);
+  distGrad.addColorStop(0.65, palette.distRock);
+  distGrad.addColorStop(1, palette.bot);
+  mountainsCtx.fillStyle = distGrad;
+  mountainsCtx.fill();
+
+  // Natural snow caps and slope highlights on peaks higher than 55% elevation
+  const snowThreshold = h * 0.58;
+  mountainsCtx.beginPath();
+  let inSnow = false;
+  for (let x = 0; x < w; x++) {
+    const elev = distHeights[x];
+    if (elev > snowThreshold) {
+      const topY = distBaseY - elev;
+      if (!inSnow) {
+        mountainsCtx.moveTo(x, topY);
+        inSnow = true;
+      } else {
+        mountainsCtx.lineTo(x, topY);
+      }
+    } else if (inSnow) {
+      mountainsCtx.lineTo(x, distBaseY - snowThreshold);
+      inSnow = false;
+    }
+  }
+  mountainsCtx.fillStyle = palette.distSnow;
+  mountainsCtx.globalAlpha = 0.85;
+  mountainsCtx.fill();
+  mountainsCtx.globalAlpha = 1.0;
+
+  // Slope Shading: East vs West face illumination
+  mountainsCtx.beginPath();
+  for (let x = 1; x < w - 1; x += 2) {
+    const slope = distHeights[x + 1] - distHeights[x - 1];
+    if (slope < -0.3) {
+      // West-facing rock shadow
+      const y = distBaseY - distHeights[x];
+      mountainsCtx.rect(x, y, 2, distHeights[x]);
+    }
+  }
+  mountainsCtx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+  mountainsCtx.fill();
+
+  // Atmospheric haze layer over distant peaks
+  const hazeGrad = mountainsCtx.createLinearGradient(0, distBaseY - h * 0.5, 0, distBaseY);
+  hazeGrad.addColorStop(0, 'transparent');
+  hazeGrad.addColorStop(1, palette.bot);
+  mountainsCtx.fillStyle = hazeGrad;
+  mountainsCtx.globalAlpha = 0.35;
+  mountainsCtx.fillRect(0, 0, w, h);
+  mountainsCtx.globalAlpha = 1.0;
+  mountainsCtx.restore();
+
+  // 2. LAYER 2: MID-RANGE GRANITE MASSIF
+  mountainsCtx.save();
+  mountainsCtx.beginPath();
+  mountainsCtx.moveTo(0, distBaseY);
+  for (let x = 0; x < w; x++) {
+    mountainsCtx.lineTo(x, distBaseY - midHeights[x]);
+  }
+  mountainsCtx.lineTo(w, distBaseY);
+  mountainsCtx.closePath();
+
+  const midGrad = mountainsCtx.createLinearGradient(0, distBaseY - h * 0.7, 0, distBaseY);
+  midGrad.addColorStop(0, palette.midRock);
+  midGrad.addColorStop(1, palette.midShade);
+  mountainsCtx.fillStyle = midGrad;
+  mountainsCtx.fill();
+
+  // Mid-range rock facet shadow
+  mountainsCtx.beginPath();
+  for (let x = 1; x < w - 1; x += 2) {
+    const slope = midHeights[x + 1] - midHeights[x - 1];
+    if (slope < -0.4) {
+      const y = distBaseY - midHeights[x];
+      mountainsCtx.rect(x, y, 2, midHeights[x]);
+    }
+  }
+  mountainsCtx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+  mountainsCtx.fill();
+  mountainsCtx.restore();
+
+  // 3. LAYER 3: FOREGROUND FOOTHILLS & EVERGREEN PINES
+  mountainsCtx.save();
+  mountainsCtx.beginPath();
+  mountainsCtx.moveTo(0, distBaseY);
+  for (let x = 0; x < w; x++) {
+    mountainsCtx.lineTo(x, distBaseY - foreHeights[x]);
+  }
+  mountainsCtx.lineTo(w, distBaseY);
+  mountainsCtx.closePath();
+
+  const foreGrad = mountainsCtx.createLinearGradient(0, distBaseY - h * 0.45, 0, distBaseY);
+  foreGrad.addColorStop(0, palette.foreRock);
+  foreGrad.addColorStop(1, palette.foreTree);
+  mountainsCtx.fillStyle = foreGrad;
+  mountainsCtx.fill();
+  mountainsCtx.restore();
+}
+
 function updateCelestialPositions(p) {
   // SUN BEHAVIOR:
-  // Starts centered in the upper sky. As user scrolls, the Sun smoothly moves UPWARD,
+  // Starts on the upper-right open sky. As user scrolls, the Sun smoothly moves UPWARD,
   // scaling down slightly and disappearing into the sky as twilight arrives.
   const sunY = -p * 550;
   const sunScale = Math.max(0.65, 1 - p * 0.45);
@@ -280,7 +517,7 @@ function updateCelestialPositions(p) {
   sunEl.style.opacity = sunOpacity.toFixed(3);
 
   // MOON BEHAVIOR:
-  // Moon enters smoothly from below and glides up into the night firmament.
+  // Moon enters smoothly from below into the clear upper-right sky.
   const moonStartProgress = 0.35;
   const moonProgress = Math.max(0, Math.min(1, (p - moonStartProgress) / (1 - moonStartProgress)));
   const moonY = lerp(380, 0, Math.pow(moonProgress, 0.85));
@@ -289,27 +526,13 @@ function updateCelestialPositions(p) {
   moonEl.style.opacity = moonOpacity.toFixed(3);
 
   // BIRDS BEHAVIOR:
-  // Birds soar gently in the daytime breeze, fading out at dusk
   const birdOpacity = Math.max(0, Math.min(1, (0.55 - p) / 0.3));
   birdsLayer.style.opacity = birdOpacity.toFixed(3);
-
-  // NOTE: Mountains remain firmly anchored at the bottom (NO downward movement on scroll).
 }
 
 let lastThemeNight = null;
 
 function updateThemeVariables(palette, p) {
-  // Directly update SVG Mountain gradient stops (zero layout reflow)
-  if (stopDistTop) stopDistTop.setAttribute('stop-color', palette.distTop);
-  if (stopDistBot) stopDistBot.setAttribute('stop-color', palette.distBot);
-  if (stopMidTop)  stopMidTop.setAttribute('stop-color', palette.midTop);
-  if (stopMidBot)  stopMidBot.setAttribute('stop-color', palette.midBot);
-  if (stopNearTop) stopNearTop.setAttribute('stop-color', palette.nearTop);
-  if (stopNearBot) stopNearBot.setAttribute('stop-color', palette.nearBot);
-  if (stopForeTop) stopForeTop.setAttribute('stop-color', palette.foreTop);
-  if (stopForeBot) stopForeBot.setAttribute('stop-color', palette.foreBot);
-
-  // Card & HUD Theme Transitions
   const isNight = p > 0.55;
   if (isNight !== lastThemeNight) {
     lastThemeNight = isNight;
@@ -349,7 +572,7 @@ function tick(timestamp) {
   const dt = Math.min(32, timestamp - lastFrameTime) / 1000;
   lastFrameTime = timestamp;
 
-  // Frame-rate independent exponential smoothing (snappy & buttery smooth)
+  // Frame-rate independent exponential smoothing
   const damping = 1 - Math.exp(-14 * dt);
   currentProgress += (targetProgress - currentProgress) * damping;
   if (Math.abs(currentProgress - targetProgress) < 0.0002) {
@@ -359,12 +582,15 @@ function tick(timestamp) {
   const palette = getInterpolatedPalette(currentProgress);
 
   renderSky(palette, currentProgress);
+  renderPhotorealisticMountains(palette, currentProgress);
   updateCelestialPositions(currentProgress);
   updateThemeVariables(palette, currentProgress);
 
   requestAnimationFrame(tick);
 }
 
+// Initialize and start animation loop
+handleResize();
 requestAnimationFrame(tick);
 
 // Interactive Quick-Shift Button (Smooth Jump between Day and Night)
